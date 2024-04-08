@@ -99,7 +99,9 @@ function init() {
             fs_1.default.mkdirSync(path_1.default.resolve(projectPath, folder), { recursive: true });
         }
         // copy .gitignore to project folder
-        const sourceGitignorePath = path_1.default.resolve(__dirname, "../public/.gitignore");
+        // the gitignore must be renamed to .gitignore, it cannot be .gitignore as the
+        // npm pack and publish commands will take it into consideration
+        const sourceGitignorePath = path_1.default.resolve(__dirname, "../public/gitignore");
         const targetGitignorePath = path_1.default.resolve(projectPath, ".gitignore");
         fs_1.default.copyFileSync(sourceGitignorePath, targetGitignorePath);
         // copy EXAMPLE_YAML.yaml to project folder

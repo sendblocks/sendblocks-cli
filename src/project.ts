@@ -91,7 +91,9 @@ export async function init(options: InitOptions = {}) {
     }
 
     // copy .gitignore to project folder
-    const sourceGitignorePath = path.resolve(__dirname, "../public/.gitignore");
+    // the gitignore must be renamed to .gitignore, it cannot be .gitignore as the
+    // npm pack and publish commands will take it into consideration
+    const sourceGitignorePath = path.resolve(__dirname, "../public/gitignore");
     const targetGitignorePath = path.resolve(projectPath, ".gitignore");
     fs.copyFileSync(sourceGitignorePath, targetGitignorePath);
 
