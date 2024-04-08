@@ -1,0 +1,42 @@
+{
+  "name": "sendblocks-cli",
+  "author": "SendBlocks",
+  "version": "0.1.0",
+  "description": "A CLI tool for interacting with the SendBlocks platform.",
+  "main": "dist/index.js",
+  "bin": {
+    "sb-cli": "./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sendblocks/sendblocks-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sendblocks/sendblocks-cli/issues"
+  },
+  "homepage": "https://github.com/sendblocks/sendblocks-cli#readme",
+  "scripts": {
+    "build": "rm -rf dist/* && npx tsc && chmod +x dist/index.js",
+    "import-spec:local": "npx openapi-typescript http://localhost:8001/openapi.json --output ./src/types/api.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sendblocks",
+    "cli",
+    "blockchain",
+    "cloud"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "@types/prompts": "^2.4.9",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "openapi-typescript-fetch": "^2.0.0",
+    "prompts": "^2.4.2",
+    "yaml": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.3"
+  }
+}
