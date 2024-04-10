@@ -1,42 +1,34 @@
 import fs from 'fs';
 import path from 'path';
 import prompts from 'prompts';
+import { ensureSendBlocksConfigured } from './config';
 
 export const FUNCTION_CODE_FOLDER = "functions";
 export const YAML_SOURCE_FOLDER = "src";
+const CONFIG_FILE = "sendblocks.config.json";
 
 type InitOptions = {
     force?: boolean;
     path?: string;
 };
 
-export function ensureSendBlocksCLIProject(options: { projectPath?: string } = {}): void {
-    const projectPath: string = options.projectPath || path.resolve(process.cwd());
-    const sendblocksFile = path.resolve(projectPath, ".sendblocks");
-    // ensure that .sendblocks file exists
-    if (!fs.existsSync(sendblocksFile)) {
-        console.error('Please initialize the project before logging in.');
-        process.exit(1);
-    }
-}
-
 export async function getSetEnvironment(
     env: string,
     options: { projectPath?: string, quiet?: boolean } = {}
 ): Promise<void> {
     const projectPath: string = options.projectPath || path.resolve(process.cwd());
-    ensureSendBlocksCLIProject({ projectPath });
+    ensureSendBlocksConfigured({ projectPath });
 
     if (env) {
         try {
             if (!options.quiet) {
-                console.log("Setting environment to", env);
+                console.log("Setting configuration for", env);
             }
-            // copy the .env file for the target environment
+            // copy the config file for the target environment
             const sourcePath = env == "default" ?
-                path.resolve(__dirname, `../.env`) :
-                path.resolve(__dirname, `../.env.${env}`);
-            const targetPath = path.resolve(projectPath, ".env");
+                path.resolve(__dirname, `../${CONFIG_FILE}`) :
+                path.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
+            const targetPath = path.resolve(projectPath, CONFIG_FILE);
             fs.copyFileSync(sourcePath, targetPath);
         } catch (error) {
             // this command isn't for public use, so be a bit less helpful
@@ -45,9 +37,9 @@ export async function getSetEnvironment(
         }
     } else {
         // show current environment
-        const envPath = path.resolve(projectPath, ".env");
+        const envPath = path.resolve(projectPath, CONFIG_FILE);
         if (fs.existsSync(envPath)) {
-            console.log("Current environment:");
+            console.log("Current configuration:");
             const envContent = fs.readFileSync(envPath, "utf-8");
             console.log(envContent);
         } else {
@@ -112,14 +104,10 @@ export async function init(options: InitOptions = {}) {
     const targetReadmePath = path.resolve(projectPath, "README.md");
     fs.copyFileSync(sourceReadmePath, targetReadmePath);
 
-    // copy default .env file to project folder
-    const sourceEnvPath = path.resolve(__dirname, "../.env");
-    const targetEnvPath = path.resolve(projectPath, ".env");
+    // copy default config file to project folder
+    const sourceEnvPath = path.resolve(__dirname, `../${CONFIG_FILE}`);
+    const targetEnvPath = path.resolve(projectPath, CONFIG_FILE);
     fs.copyFileSync(sourceEnvPath, targetEnvPath);
-
-    // create hidden .sendblocks file to mark that project is appropriate to save .auth token
-    const sendblocksPath = path.resolve(projectPath, ".sendblocks");
-    fs.writeFileSync(sendblocksPath, "");
 
     console.log("Project initialized successfully!");
 }

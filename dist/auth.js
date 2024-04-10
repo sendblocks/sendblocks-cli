@@ -14,9 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = exports.loadToken = void 0;
 const fs_1 = __importDefault(require("fs"));
-require("dotenv/config");
 const prompts_1 = __importDefault(require("prompts"));
-const project_1 = require("./project");
+const config_1 = require("./config");
 function loadToken() {
     return __awaiter(this, void 0, void 0, function* () {
         // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
@@ -37,26 +36,26 @@ function loadToken() {
 exports.loadToken = loadToken;
 function login() {
     return __awaiter(this, void 0, void 0, function* () {
-        (0, project_1.ensureSendBlocksCLIProject)();
-        const AUTH_URL = process.env['AUTH_URL'] || "";
-        if (AUTH_URL.length === 0) {
+        (0, config_1.ensureSendBlocksConfigured)();
+        if (config_1.authUrl.length === 0) {
             console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
             process.exit(1);
         }
-        console.log(`Authenticating with FrontEgg...`);
         const clientId = yield (0, prompts_1.default)({
             type: 'text',
             name: 'value',
-            message: 'Enter your FrontEgg Client ID',
+            message: 'Enter your SendBlocks Client ID',
         });
+        if (!clientId.value || clientId.value.length === 0) {
+            throw new Error('Client ID is required.');
+        }
         const secret = yield (0, prompts_1.default)({
             type: 'password',
             name: 'value',
-            message: 'Enter your FrontEgg Secret',
+            message: 'Enter your SendBlocks Secret',
         });
-        if (!clientId.value || clientId.value.length === 0 ||
-            !secret.value || secret.value.length === 0) {
-            throw new Error('Client ID and Secret are required.');
+        if (!secret.value || secret.value.length === 0) {
+            throw new Error('Secret is required.');
         }
         // delete the .auth file
         try {
@@ -66,7 +65,7 @@ function login() {
             // ignore error
         }
         let token;
-        const response = yield fetch(AUTH_URL, {
+        const response = yield fetch(config_1.authUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

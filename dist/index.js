@@ -37,6 +37,7 @@ const commander_1 = require("commander");
 const package_json_1 = require("../package.json");
 const auth_1 = require("./auth");
 const deploy_1 = require("./deploy");
+const destroy_1 = require("./destroy");
 const functions = __importStar(require("./functions"));
 const project_1 = require("./project");
 const webhooks = __importStar(require("./webhooks"));
@@ -113,6 +114,19 @@ program
     .action(() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, deploy_1.deploy)();
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+program
+    .command("destroy")
+    .description("Delete the referenced resources on SendBlocks.")
+    .option("--dry-run", "Preview destructive changes only.")
+    .action((options) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, destroy_1.destroy)(options);
     }
     catch (error) {
         console.error(error.message);

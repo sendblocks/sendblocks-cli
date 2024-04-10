@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deploy = exports.deleteFunction = exports.getFunctionCode = exports.getFunctionDictionary = exports.listFunctions = exports.isFunctionChanged = exports.convertBase64ToFunction = exports.convertFunctionToBase64 = void 0;
+exports.destroy = exports.deploy = exports.deleteFunction = exports.getFunctionCode = exports.getFunctionDictionary = exports.listFunctions = exports.isFunctionChanged = exports.convertBase64ToFunction = exports.convertFunctionToBase64 = void 0;
 const fetcher_1 = require("./fetcher");
 const function_triggers_1 = require("./function-triggers");
 function convertFunctionToBase64(functionCode) {
@@ -136,7 +136,7 @@ function deploy(stateChanges, webhookDeploymentResults) {
                         results.push({
                             function_name: addedFunction.function_name,
                             function_id: response.data.function_id,
-                            succeeded: true,
+                            deployed: true,
                         });
                     }
                     else {
@@ -145,7 +145,7 @@ function deploy(stateChanges, webhookDeploymentResults) {
                 }
                 catch (error) {
                     results.push({
-                        succeeded: false,
+                        deployed: false,
                         function_name: addedFunction.function_name,
                         response: `${error}`,
                     });
@@ -173,4 +173,36 @@ function deploy(stateChanges, webhookDeploymentResults) {
     });
 }
 exports.deploy = deploy;
+function destroy(stateChanges) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const api = yield generateFunctionsApi();
+        const results = [];
+        const functionsToDelete = [...stateChanges.changed, ...stateChanges.unchanged];
+        for (const functionToDelete of functionsToDelete) {
+            console.log(`Deleting function ${functionToDelete.function_name}...`);
+            try {
+                const response = yield api.deleteFunction({ id: functionToDelete.function_id });
+                if (response.ok) {
+                    results.push({
+                        function_name: functionToDelete.function_name,
+                        destroyed: true,
+                    });
+                }
+                else {
+                    throw new Error(`${response.status} ${response.data}`);
+                }
+            }
+            catch (error) {
+                results.push({
+                    destroyed: false,
+                    function_name: functionToDelete.function_name,
+                    response: `${error}`,
+                });
+                throw new Error(`Error occurred while deleting function ${functionToDelete.function_name}: ${error}`);
+            }
+        }
+        return results;
+    });
+}
+exports.destroy = destroy;
 //# sourceMappingURL=functions.js.map

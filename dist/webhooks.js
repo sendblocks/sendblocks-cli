@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deploy = exports.deleteWebhook = exports.getWebhookDictionary = exports.listWebhooks = exports.isWebhookChanged = void 0;
+exports.destroy = exports.deploy = exports.deleteWebhook = exports.getWebhookDictionary = exports.listWebhooks = exports.isWebhookChanged = void 0;
 const fetcher_1 = require("./fetcher");
 function generateWebhooksApi() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -97,7 +97,7 @@ function deploy(stateChanges) {
                 });
                 if (response.ok) {
                     results.push({
-                        succeeded: true,
+                        deployed: true,
                         webhook_name: addedWebhook.webhook_name,
                         webhook_id: response.data.webhook_id,
                         url: addedWebhook.url
@@ -109,7 +109,7 @@ function deploy(stateChanges) {
             }
             catch (error) {
                 results.push({
-                    succeeded: false,
+                    deployed: false,
                     webhook_name: addedWebhook.webhook_name,
                     url: addedWebhook.url,
                     response: `${error}`,
@@ -136,4 +136,35 @@ function deploy(stateChanges) {
     });
 }
 exports.deploy = deploy;
+function destroy(stateChanges, functionDeploymentResults) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const api = yield generateWebhooksApi();
+        const results = [];
+        const webhooksToDelete = [...stateChanges.changed, ...stateChanges.unchanged];
+        for (const webhookToDelete of webhooksToDelete) {
+            console.log(`Deleting webhook ${webhookToDelete.webhook_name}...`);
+            try {
+                const response = yield api.deleteWebhook({ id: webhookToDelete.webhook_id });
+                if (response.ok) {
+                    results.push({
+                        webhook_name: webhookToDelete.webhook_name,
+                        destroyed: true,
+                    });
+                }
+                else {
+                    throw new Error(`${response.status} ${response.statusText}`);
+                }
+            }
+            catch (error) {
+                results.push({
+                    destroyed: false,
+                    webhook_name: webhookToDelete.webhook_name,
+                    response: `${error}`,
+                });
+            }
+        }
+        return results;
+    });
+}
+exports.destroy = destroy;
 //# sourceMappingURL=webhooks.js.map

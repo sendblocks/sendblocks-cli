@@ -1,11 +1,10 @@
-import 'dotenv/config';
 import { Fetcher } from 'openapi-typescript-fetch';
 
 import { loadToken } from './auth';
+import { apiUrl } from './config';
 import { paths } from './types/api';
 
 export async function generateFetcher() {
-    const apiUrl = process.env["API_URL"] || "";
     if (apiUrl.length === 0) {
         console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
         process.exit(1);

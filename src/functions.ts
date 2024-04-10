@@ -117,7 +117,7 @@ export async function deploy(stateChanges: ResourceStateChanges, webhookDeployme
                     results.push({
                         function_name: addedFunction.function_name,
                         function_id: response.data.function_id,
-                        succeeded: true,
+                        deployed: true,
                     });
                 } else {
                     throw new Error(`${response.status} ${response.data}`);
@@ -125,7 +125,7 @@ export async function deploy(stateChanges: ResourceStateChanges, webhookDeployme
                 }
             } catch (error) {
                 results.push({
-                    succeeded: false,
+                    deployed: false,
                     function_name: addedFunction.function_name,
                     response: `${error}`,
                 });
@@ -150,6 +150,37 @@ export async function deploy(stateChanges: ResourceStateChanges, webhookDeployme
             function_name: unchangedFunction.function_name,
             function_id: unchangedFunction.function_id,
         });
+    }
+
+    return results;
+}
+
+export async function destroy(stateChanges: ResourceStateChanges) {
+    const api = await generateFunctionsApi();
+    const results = [];
+
+    const functionsToDelete = [...stateChanges.changed, ...stateChanges.unchanged];
+
+    for (const functionToDelete of functionsToDelete) {
+        console.log(`Deleting function ${functionToDelete.function_name}...`);
+        try {
+            const response = await api.deleteFunction({id: functionToDelete.function_id});
+            if (response.ok) {
+                results.push({
+                    function_name: functionToDelete.function_name,
+                    destroyed: true,
+                });
+            } else {
+                throw new Error(`${response.status} ${response.data}`);
+            }
+        } catch (error) {
+            results.push({
+                destroyed: false,
+                function_name: functionToDelete.function_name,
+                response: `${error}`,
+            });
+            throw new Error(`Error occurred while deleting function ${functionToDelete.function_name}: ${error}`);
+        }
     }
 
     return results;

@@ -81,7 +81,7 @@ export async function deploy(stateChanges: ResourceStateChanges) {
             });
             if (response.ok) {
                 results.push({
-                    succeeded: true,
+                    deployed: true,
                     webhook_name: addedWebhook.webhook_name,
                     webhook_id: response.data.webhook_id,
                     url: addedWebhook.url
@@ -91,7 +91,7 @@ export async function deploy(stateChanges: ResourceStateChanges) {
             }
         } catch (error) {
             results.push({
-                succeeded: false,
+                deployed: false,
                 webhook_name: addedWebhook.webhook_name,
                 url: addedWebhook.url,
                 response: `${error}`,
@@ -114,6 +114,36 @@ export async function deploy(stateChanges: ResourceStateChanges) {
             url: unchangedWebhook.url,
             webhook_id: unchangedWebhook.webhook_id,
         });
+    }
+
+    return results;
+}
+
+export async function destroy(stateChanges: ResourceStateChanges, functionDeploymentResults: any) {
+    const api = await generateWebhooksApi();
+    const results = [];
+
+    const webhooksToDelete = [...stateChanges.changed, ...stateChanges.unchanged];
+
+    for (const webhookToDelete of webhooksToDelete) {
+        console.log(`Deleting webhook ${webhookToDelete.webhook_name}...`);
+        try {
+            const response = await api.deleteWebhook({id: webhookToDelete.webhook_id});
+            if (response.ok) {
+                results.push({
+                    webhook_name: webhookToDelete.webhook_name,
+                    destroyed: true,
+                });
+            } else {
+                throw new Error(`${response.status} ${response.statusText}`);
+            }
+        } catch (error) {
+            results.push({
+                destroyed: false,
+                webhook_name: webhookToDelete.webhook_name,
+                response: `${error}`,
+            });
+        }
     }
 
     return results;

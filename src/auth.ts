@@ -1,8 +1,7 @@
 import fs from 'fs';
 
-import 'dotenv/config';
 import prompts from 'prompts';
-import { ensureSendBlocksCLIProject } from './project';
+import { authUrl, ensureSendBlocksConfigured } from './config';
 
 export async function loadToken() {
     // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
@@ -20,30 +19,31 @@ export async function loadToken() {
 }
 
 export async function login(): Promise<string> {
-    ensureSendBlocksCLIProject();
+    ensureSendBlocksConfigured();
 
-    const AUTH_URL: string = process.env['AUTH_URL'] || "";
-    if (AUTH_URL.length === 0) {
+    if (authUrl.length === 0) {
         console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
         process.exit(1);
     }
-    console.log(`Authenticating with FrontEgg...`)
 
     const clientId = await prompts({
         type: 'text',
         name: 'value',
-        message: 'Enter your FrontEgg Client ID',
+        message: 'Enter your SendBlocks Client ID',
     });
+
+    if (!clientId.value || clientId.value.length === 0) {
+        throw new Error('Client ID is required.');
+    }
 
     const secret = await prompts({
         type: 'password',
         name: 'value',
-        message: 'Enter your FrontEgg Secret',
+        message: 'Enter your SendBlocks Secret',
     });
 
-    if (!clientId.value || clientId.value.length === 0 ||
-        !secret.value || secret.value.length === 0) {
-        throw new Error('Client ID and Secret are required.');
+    if (!secret.value || secret.value.length === 0) {
+        throw new Error('Secret is required.');
     }
 
     // delete the .auth file
@@ -54,7 +54,7 @@ export async function login(): Promise<string> {
     }
 
     let token: string;
-    const response = await fetch(AUTH_URL, {
+    const response = await fetch(authUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

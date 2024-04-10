@@ -12,36 +12,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = exports.getSetEnvironment = exports.ensureSendBlocksCLIProject = exports.YAML_SOURCE_FOLDER = exports.FUNCTION_CODE_FOLDER = void 0;
+exports.init = exports.getSetEnvironment = exports.YAML_SOURCE_FOLDER = exports.FUNCTION_CODE_FOLDER = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const prompts_1 = __importDefault(require("prompts"));
+const config_1 = require("./config");
 exports.FUNCTION_CODE_FOLDER = "functions";
 exports.YAML_SOURCE_FOLDER = "src";
-function ensureSendBlocksCLIProject(options = {}) {
-    const projectPath = options.projectPath || path_1.default.resolve(process.cwd());
-    const sendblocksFile = path_1.default.resolve(projectPath, ".sendblocks");
-    // ensure that .sendblocks file exists
-    if (!fs_1.default.existsSync(sendblocksFile)) {
-        console.error('Please initialize the project before logging in.');
-        process.exit(1);
-    }
-}
-exports.ensureSendBlocksCLIProject = ensureSendBlocksCLIProject;
+const CONFIG_FILE = "sendblocks.config.json";
 function getSetEnvironment(env_1) {
     return __awaiter(this, arguments, void 0, function* (env, options = {}) {
         const projectPath = options.projectPath || path_1.default.resolve(process.cwd());
-        ensureSendBlocksCLIProject({ projectPath });
+        (0, config_1.ensureSendBlocksConfigured)({ projectPath });
         if (env) {
             try {
                 if (!options.quiet) {
-                    console.log("Setting environment to", env);
+                    console.log("Setting configuration for", env);
                 }
-                // copy the .env file for the target environment
+                // copy the config file for the target environment
                 const sourcePath = env == "default" ?
-                    path_1.default.resolve(__dirname, `../.env`) :
-                    path_1.default.resolve(__dirname, `../.env.${env}`);
-                const targetPath = path_1.default.resolve(projectPath, ".env");
+                    path_1.default.resolve(__dirname, `../${CONFIG_FILE}`) :
+                    path_1.default.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
+                const targetPath = path_1.default.resolve(projectPath, CONFIG_FILE);
                 fs_1.default.copyFileSync(sourcePath, targetPath);
             }
             catch (error) {
@@ -52,9 +44,9 @@ function getSetEnvironment(env_1) {
         }
         else {
             // show current environment
-            const envPath = path_1.default.resolve(projectPath, ".env");
+            const envPath = path_1.default.resolve(projectPath, CONFIG_FILE);
             if (fs_1.default.existsSync(envPath)) {
-                console.log("Current environment:");
+                console.log("Current configuration:");
                 const envContent = fs_1.default.readFileSync(envPath, "utf-8");
                 console.log(envContent);
             }
@@ -116,13 +108,10 @@ function init() {
         const sourceReadmePath = path_1.default.resolve(__dirname, "../public/PROJECT_README.md");
         const targetReadmePath = path_1.default.resolve(projectPath, "README.md");
         fs_1.default.copyFileSync(sourceReadmePath, targetReadmePath);
-        // copy default .env file to project folder
-        const sourceEnvPath = path_1.default.resolve(__dirname, "../.env");
-        const targetEnvPath = path_1.default.resolve(projectPath, ".env");
+        // copy default config file to project folder
+        const sourceEnvPath = path_1.default.resolve(__dirname, `../${CONFIG_FILE}`);
+        const targetEnvPath = path_1.default.resolve(projectPath, CONFIG_FILE);
         fs_1.default.copyFileSync(sourceEnvPath, targetEnvPath);
-        // create hidden .sendblocks file to mark that project is appropriate to save .auth token
-        const sendblocksPath = path_1.default.resolve(projectPath, ".sendblocks");
-        fs_1.default.writeFileSync(sendblocksPath, "");
         console.log("Project initialized successfully!");
     });
 }

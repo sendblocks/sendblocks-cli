@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { bin, description, version } from '../package.json';
 import { login } from './auth';
 import { deploy } from './deploy';
+import { destroy } from './destroy';
 import * as functions from './functions';
 import { getSetEnvironment, init } from './project';
 import * as webhooks from './webhooks';
@@ -84,6 +85,19 @@ program
     .action(async () => {
         try {
             await deploy();
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+
+program
+    .command("destroy")
+    .description("Delete the referenced resources on SendBlocks.")
+    .option("--dry-run", "Preview destructive changes only.")
+    .action(async (options) => {
+        try {
+            await destroy(options);
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);

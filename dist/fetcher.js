@@ -10,20 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateFetcher = void 0;
-require("dotenv/config");
 const openapi_typescript_fetch_1 = require("openapi-typescript-fetch");
 const auth_1 = require("./auth");
+const config_1 = require("./config");
 function generateFetcher() {
     return __awaiter(this, void 0, void 0, function* () {
-        const apiUrl = process.env["API_URL"] || "";
-        if (apiUrl.length === 0) {
+        if (config_1.apiUrl.length === 0) {
             console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
             process.exit(1);
         }
         const token = yield (0, auth_1.loadToken)();
         const fetcher = openapi_typescript_fetch_1.Fetcher.for();
         fetcher.configure({
-            baseUrl: apiUrl,
+            baseUrl: config_1.apiUrl,
             init: {
                 headers: {
                     Authorization: `Bearer ${token}`
