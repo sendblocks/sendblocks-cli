@@ -52,6 +52,11 @@ function destroy() {
             console.log('Dry-run complete! No resources were destroyed.');
             return;
         }
+        if (stateChanges.webhooks.changed.length === 0 && stateChanges.webhooks.unchanged.length === 0 &&
+            stateChanges.functions.changed.length === 0 && stateChanges.functions.unchanged.length === 0) {
+            console.log('No resources to destroy');
+            return;
+        }
         // confirm changes with the user
         const confirm = yield (0, prompts_1.default)({
             type: 'confirm',

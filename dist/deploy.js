@@ -70,7 +70,7 @@ function deploy() {
             console.log('\nWebhook deployment results:');
             console.table(webhookResults, ['webhook_name', 'webhook_id', 'deployed', 'skipped', 'response']);
             console.log('Function deployment results:');
-            console.table(functionResults, ['function_name', 'webhook_id', 'deployed', 'skipped', 'response']);
+            console.table(functionResults, ['function_name', 'function_id', 'deployed', 'skipped', 'response']);
         }
     });
 }
@@ -101,15 +101,15 @@ function printStateChanges(stateChanges) {
     }
     if (stateChanges.functions.changed.length > 0) {
         console.log(' - Changed:');
-        console.table(stateChanges.functions.changed, ['function_name', 'chain_id', 'webhook', 'should_send_std_streams', 'changes']);
+        console.table(stateChanges.functions.changed, ['function_name', 'function_id', 'chain_id', 'webhook', 'should_send_std_streams', 'changes']);
     }
     if (stateChanges.functions.unchanged.length > 0) {
         console.log(' - Unchanged:');
-        console.table(stateChanges.functions.unchanged, ['function_name', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
+        console.table(stateChanges.functions.unchanged, ['function_name', 'function_id', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
     }
     if (stateChanges.functions.unreferenced.length > 0) {
         console.log(' - Unreferenced:');
-        console.table(stateChanges.functions.unreferenced, ['function_name', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
+        console.table(stateChanges.functions.unreferenced, ['function_name', 'function_id', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
     }
 }
 //# sourceMappingURL=deploy.js.map

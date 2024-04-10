@@ -25,6 +25,12 @@ export async function destroy({dryRun}: { dryRun?: boolean} = {}) {
         return;
     }
 
+    if (stateChanges.webhooks.changed.length === 0 && stateChanges.webhooks.unchanged.length === 0 &&
+        stateChanges.functions.changed.length === 0 && stateChanges.functions.unchanged.length === 0) {
+        console.log('No resources to destroy');
+        return;
+    }
+
     // confirm changes with the user
     const confirm = await prompts({
         type: 'confirm',

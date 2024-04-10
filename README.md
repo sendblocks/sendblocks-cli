@@ -20,8 +20,10 @@ sb-cli -h
 
 **NOTE**: For direct execution using `npx`, wherever the usage says `sb-cli`, use `sendblocks-cli` instead.
 
+For usage instructions:
+
 ```shell
-Run npx sendblocks-cli -h
+npx sendblocks-cli -h
 ```
 
 ## Authentication
