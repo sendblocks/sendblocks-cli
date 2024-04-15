@@ -53,24 +53,33 @@ export async function init(options: InitOptions = {}) {
     const projectPath: string = path.resolve(options.path || process.cwd());
     console.log(`Initializing project at ${projectPath} ...`);
 
-    // ensure folder empty
+    const targetEnvPath = path.resolve(projectPath, CONFIG_FILE);
+    const targetFunctionPath = path.resolve(projectPath, FUNCTION_CODE_FOLDER, "echo_function.ts");
+    const targetGitignorePath = path.resolve(projectPath, ".gitignore");
+    const targetReadmePath = path.resolve(projectPath, "README.md");
+    const targetYamlPath = path.resolve(projectPath, YAML_SOURCE_FOLDER, "functions.yaml");
+
+    const targetFiles = [targetEnvPath, targetFunctionPath, targetGitignorePath, targetReadmePath, targetYamlPath];
+
     if (fs.existsSync(projectPath)) {
-        const files = fs.readdirSync(projectPath, { withFileTypes: true }).map((file) => file.name);
-        if (files.length > 0) {
-            if (!options.force) {
-                console.error("Folder is not empty! Use --force to initialize anyway.");
-                process.exit(1);
-            } else {
-                console.log("Folder is not empty! Force initialization?");
-                const confirm = await prompts({
-                    type: "confirm",
-                    name: "value",
-                    message: "Are you sure you want to initialize the project?",
-                });
-                if (!confirm.value) {
-                    console.log("Aborting initialization.");
-                    process.exit(0);
-                }
+        // check if any of the target files exists in the current directory
+        const filesToBeOverwritten: string[] = [];
+        for (const targetFile of targetFiles) {
+            if (fs.existsSync(targetFile)) {
+                filesToBeOverwritten.push(targetFile);
+            }
+        }
+
+        if (filesToBeOverwritten.length > 0) {
+            console.warn(`\nWARNING: The following files will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`);
+            const confirm = await prompts({
+                type: "confirm",
+                name: "value",
+                message: "Are you sure you want to continue with the project initialization?",
+            });
+            if (!confirm.value) {
+                console.log("Aborting initialization.");
+                process.exit(0);
             }
         }
     }
@@ -82,32 +91,32 @@ export async function init(options: InitOptions = {}) {
         fs.mkdirSync(path.resolve(projectPath, folder), { recursive: true });
     }
 
-    // copy .gitignore to project folder
-    // the gitignore must be renamed to .gitignore, it cannot be .gitignore as the
-    // npm pack and publish commands will take it into consideration
+    // copy / append to .gitignore in project folder
+    // the source sendblocks-cli gitignore must not be named .gitignore, as the npm pack and
+    // publish commands will take it into consideration
     const sourceGitignorePath = path.resolve(__dirname, "../public/gitignore");
-    const targetGitignorePath = path.resolve(projectPath, ".gitignore");
-    fs.copyFileSync(sourceGitignorePath, targetGitignorePath);
+    if (fs.existsSync(targetGitignorePath)) {
+        const gitignoreContent = fs.readFileSync(sourceGitignorePath, "utf-8");
+        fs.appendFileSync(targetGitignorePath, gitignoreContent);
+    } else {
+        fs.copyFileSync(sourceGitignorePath, targetGitignorePath);
+    }
 
     // copy EXAMPLE_YAML.yaml to project folder
     const sourceYamlPath = path.resolve(__dirname, "../public/EXAMPLE_YAML.yaml");
-    const targetYamlPath = path.resolve(projectPath, YAML_SOURCE_FOLDER, "functions.yaml");
     fs.copyFileSync(sourceYamlPath, targetYamlPath);
 
     // copy example function code to project folder
     const sourceFunctionPath = path.resolve(__dirname, "../public/echo_function.ts");
-    const targetFunctionPath = path.resolve(projectPath, FUNCTION_CODE_FOLDER, "echo_function.ts");
     fs.copyFileSync(sourceFunctionPath, targetFunctionPath);
 
     // copy PROJECT_README.md to project project
     const sourceReadmePath = path.resolve(__dirname, "../public/PROJECT_README.md");
-    const targetReadmePath = path.resolve(projectPath, "README.md");
     fs.copyFileSync(sourceReadmePath, targetReadmePath);
 
     // copy default config file to project folder
     const sourceEnvPath = path.resolve(__dirname, `../${CONFIG_FILE}`);
-    const targetEnvPath = path.resolve(projectPath, CONFIG_FILE);
     fs.copyFileSync(sourceEnvPath, targetEnvPath);
 
-    console.log("Project initialized successfully!");
+    console.log("\nProject initialized successfully!");
 }

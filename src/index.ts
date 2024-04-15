@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import { bin, description, version } from '../package.json';
 import { login } from './auth';
+import { convertHexOrDecimal } from './convert';
 import { deploy } from './deploy';
 import { destroy } from './destroy';
 import * as functions from './functions';
@@ -55,13 +56,9 @@ program
     .command("init")
     .description("Initialize a new project.")
     .argument("[path]", "Path to the project folder.")
-    .option("-f, --force", "Force initialization even if the folder is not empty.")
-    .action(async (path, options) => {
+    .action(async (path) => {
         try {
-            await init({
-                path,
-                force: options.force,
-            });
+            await init({ path });
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);
@@ -146,6 +143,19 @@ program
                 default:
                     console.error("Invalid command!");
             }
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+
+program
+    .command("hex")
+    .description("Convert to or from hexadecimal and decimal")
+    .argument("<value>", "Hexadecimal or decimal string to convert")
+    .action((val) => {
+        try {
+            console.log(convertHexOrDecimal(val));
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);

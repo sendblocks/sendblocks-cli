@@ -41,6 +41,14 @@ const path_1 = __importDefault(require("path"));
 const functionTriggers = __importStar(require("./function-triggers"));
 const functions = __importStar(require("./functions"));
 const webhooks = __importStar(require("./webhooks"));
+function findWebhookById(webhookId, webhooks) {
+    return [
+        ...webhooks.added,
+        ...webhooks.changed,
+        ...webhooks.unchanged,
+        ...webhooks.unreferenced
+    ].find((webhook) => webhook.webhook_id === webhookId);
+}
 function findWebhookByName(webhookName, webhooks) {
     return [
         ...webhooks.added,
@@ -178,6 +186,11 @@ function generateStateChanges(spec) {
         }
         for (const function_name in sendblocksFunctions) {
             const sendblocksFunction = sendblocksFunctions[function_name];
+            const webhook = findWebhookById(sendblocksFunction.webhook_id, result.webhooks);
+            if (!webhook) {
+                throw new Error(`Function ${function_name} references a webhook that does not exist: ${sendblocksFunction.webhook_id}`);
+            }
+            sendblocksFunction.webhook = webhook.webhook_name;
             if (!Object.keys(spec.functions).includes(function_name)) {
                 result.functions.unreferenced.push(Object.assign(Object.assign({ function_name: sendblocksFunction.function_name, function_id: sendblocksFunction.function_id }, sendblocksFunction), { trigger_types: sendblocksFunction.triggers.map((trigger) => trigger.type).join(', '), should_send_std_streams: should_send_std_streams(sendblocksFunction.should_send_std_streams) }));
             }

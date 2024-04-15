@@ -11,6 +11,15 @@ type StateComparisonResult = {
     functions: ResourceStateChanges,
 };
 
+function findWebhookById(webhookId: string, webhooks: ResourceStateChanges) {
+    return [
+        ...webhooks.added,
+        ...webhooks.changed,
+        ...webhooks.unchanged,
+        ...webhooks.unreferenced
+    ].find((webhook: any) => webhook.webhook_id === webhookId);
+}
+
 function findWebhookByName(webhookName: string, webhooks: ResourceStateChanges) {
     return [
         ...webhooks.added,
@@ -171,6 +180,11 @@ export async function generateStateChanges(spec: Spec) {
     }
     for (const function_name in sendblocksFunctions) {
         const sendblocksFunction = sendblocksFunctions[function_name];
+        const webhook = findWebhookById(sendblocksFunction.webhook_id, result.webhooks);
+        if (!webhook) {
+            throw new Error(`Function ${function_name} references a webhook that does not exist: ${sendblocksFunction.webhook_id}`);
+        }
+        sendblocksFunction.webhook = webhook.webhook_name;
         if (!Object.keys(spec.functions).includes(function_name)) {
             result.functions.unreferenced.push({
                 function_name: sendblocksFunction.function_name,

@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const package_json_1 = require("../package.json");
 const auth_1 = require("./auth");
+const convert_1 = require("./convert");
 const deploy_1 = require("./deploy");
 const destroy_1 = require("./destroy");
 const functions = __importStar(require("./functions"));
@@ -83,13 +84,9 @@ program
     .command("init")
     .description("Initialize a new project.")
     .argument("[path]", "Path to the project folder.")
-    .option("-f, --force", "Force initialization even if the folder is not empty.")
-    .action((path, options) => __awaiter(void 0, void 0, void 0, function* () {
+    .action((path) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, project_1.init)({
-            path,
-            force: options.force,
-        });
+        yield (0, project_1.init)({ path });
     }
     catch (error) {
         console.error(error.message);
@@ -181,5 +178,18 @@ program
         process.exit(1);
     }
 }));
+program
+    .command("hex")
+    .description("Convert to or from hexadecimal and decimal")
+    .argument("<value>", "Hexadecimal or decimal string to convert")
+    .action((val) => {
+    try {
+        console.log((0, convert_1.convertHexOrDecimal)(val));
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+});
 program.parse(process.argv);
 //# sourceMappingURL=index.js.map
