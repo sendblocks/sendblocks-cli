@@ -49,7 +49,7 @@ The following files will be modified / overwritten:
 ## Authentication
 
 Once your project has been initialized, you will be able to sign in to the SendBlocks API.
-For this you will require a client ID and secret, if you don't already have them then [please get in touch with us](https://sendblocks.io/#getstart)!
+For this you will require a client ID and secret, if you don't already have them then [please get in touch with us](https://sendblocks.io/#getstarted)!
 
 If you have your credentials, sign in using `sb-cli login` and the token will be stored in `.auth` and printed to your console.
 
