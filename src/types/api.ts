@@ -15,6 +15,10 @@ export interface paths {
     /** Get Events */
     get: operations["get_events_api_v1_events_get"];
   };
+  "/api/v1/stats": {
+    /** Get Stats */
+    get: operations["get_stats_api_v1_stats_get"];
+  };
   "/api/v1/functions": {
     /** List Functions */
     get: operations["list_functions_api_v1_functions_get"];
@@ -43,6 +47,10 @@ export interface paths {
   "/api/v1/functions/replay_blocks": {
     /** Replay Blocks */
     post: operations["replay_blocks_api_v1_functions_replay_blocks_post"];
+  };
+  "/api/v1/functions/{id}/stats": {
+    /** Get Function Stats */
+    get: operations["get_function_stats_api_v1_functions__id__stats_get"];
   };
   "/api/v1/data/nft/": {
     /** Get Nft For Owner */
@@ -260,7 +268,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable Coin
        * @description The stable coin alerted in the event
@@ -300,7 +308,7 @@ export interface components {
      * @description An enumeration.
      * @enum {unknown}
      */
-    Chain: "1" | "11155111" | "42161" | "137" | "23448594291968334" | "osmosis-1" | "1313161554" | "56" | "97";
+    Chain: "1" | "11155111" | "42161" | "137" | "23448594291968334" | "osmosis-1" | "1313161554" | "56" | "97" | "5000" | "59144" | "solana-mainnet";
     /** ConcentrationEvent */
     ConcentrationEvent: {
       /**
@@ -406,7 +414,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {unknown}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable Coin
        * @description The stable coin to be checked against in the subscription
@@ -431,7 +439,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable coin
        * @description The stable coin to be tracked in the subscription
@@ -487,7 +495,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable coin
        * @description The stable coin to be tracked in the subscription
@@ -667,7 +675,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {unknown}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable Coin
        * @description The stable coin to be checked against in the subscription
@@ -730,7 +738,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable coin
        * @description The stable coin to be tracked in the subscription
@@ -798,7 +806,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {unknown}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Alerted Stable Coin
        * @description The stable coin to be tracked in the subscription
@@ -903,7 +911,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Stable coin
        * @description The stable coin alerted in the event
@@ -950,7 +958,7 @@ export interface components {
       /** Items */
       items: components["schemas"]["Event"][];
       /** Total */
-      total: number;
+      total?: number;
       /** Page */
       page?: number;
       /** Size */
@@ -963,7 +971,7 @@ export interface components {
       /** Items */
       items: components["schemas"]["FuncInfo"][];
       /** Total */
-      total: number;
+      total?: number;
       /** Page */
       page?: number;
       /** Size */
@@ -976,7 +984,7 @@ export interface components {
       /** Items */
       items: components["schemas"]["PublicShareInfo"][];
       /** Total */
-      total: number;
+      total?: number;
       /** Page */
       page?: number;
       /** Size */
@@ -989,7 +997,33 @@ export interface components {
       /** Items */
       items: components["schemas"]["RpcApiKeyId"][];
       /** Total */
-      total: number;
+      total?: number;
+      /** Page */
+      page?: number;
+      /** Size */
+      size?: number;
+      /** Pages */
+      pages?: number;
+    };
+    /** Page[Stat] */
+    Page_Stat_: {
+      /** Items */
+      items: components["schemas"]["Stat"][];
+      /** Total */
+      total?: number;
+      /** Page */
+      page?: number;
+      /** Size */
+      size?: number;
+      /** Pages */
+      pages?: number;
+    };
+    /** Page[VariableStorageMapping] */
+    Page_VariableStorageMapping_: {
+      /** Items */
+      items: components["schemas"]["VariableStorageMapping"][];
+      /** Total */
+      total?: number;
       /** Page */
       page?: number;
       /** Size */
@@ -1002,7 +1036,7 @@ export interface components {
       /** Items */
       items: components["schemas"]["WebhookInfo"][];
       /** Total */
-      total: number;
+      total?: number;
       /** Page */
       page?: number;
       /** Size */
@@ -1039,9 +1073,9 @@ export interface components {
      * @description An enumeration.
      * @enum {unknown}
      */
-    PydanticAddressLocations: "trace_to" | "trace_from" | "trace_input" | "trace_output" | "log_emitter" | "log_topic" | "log_data" | "storage_key" | "storage_value" | "storage_address";
-    /** ReplayParams */
-    ReplayParams: {
+    PydanticAddressLocations: "trace_to" | "trace_from" | "trace_input" | "trace_output" | "log_emitter" | "log_topic" | "log_data" | "storage_key" | "storage_value" | "storage_address" | "event_attribute";
+    /** ReplayBlocksParams */
+    ReplayBlocksParams: {
       /**
        * Functions
        * @description List of function IDs to replay
@@ -1054,7 +1088,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * StartBlockNumber
        * @description The first block number that will be replayed
@@ -1065,6 +1099,12 @@ export interface components {
        * @description The last block number that will be replayed
        */
       end_block_number: number;
+      /**
+       * XLFlag
+       * @description If true, invokes extended replay. This is used when replaying a large number of blocks
+       * @default false
+       */
+      xl_flag?: boolean;
     };
     /**
      * RiskLevels
@@ -1101,7 +1141,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
       /**
        * Triggers
        * @description Triggers that will invoke the function
@@ -1195,10 +1235,34 @@ export interface components {
      * @enum {unknown}
      */
     StableCoins: "USDT" | "USDC" | "DAI";
-    /** StorageLayout */
-    StorageLayout: {
-      /** Storage Layout */
-      storage_layout?: components["schemas"]["VariableStorageMapping"][];
+    /** Stat */
+    Stat: {
+      /** Tenant Id */
+      tenant_id?: string;
+      /** Start Time */
+      start_time?: string;
+      /** End Time */
+      end_time?: string;
+      /**
+       * Interval
+       * @description The time interval for the stats
+       * @example STAT_INTERVAL_HOUR
+       * @enum {string}
+       */
+      interval: "STAT_INTERVAL_UNSPECIFIED" | "STAT_INTERVAL_HOUR" | "STAT_INTERVAL_DAY" | "STAT_INTERVAL_WEEK" | "STAT_INTERVAL_MONTH";
+      /**
+       * Event type
+       * @description The type of the system event that occurred
+       * @example EVENT_TYPE_RUN_FUNCTION
+       * @enum {string}
+       */
+      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE";
+      /** Func Id */
+      func_id?: string;
+      /** Webhook Id */
+      webhook_id?: string;
+      /** Stats */
+      stats?: string;
     };
     /** By Slot */
     StorageSlotTrigger: {
@@ -1245,7 +1309,7 @@ export interface components {
      * @description An enumeration.
      * @enum {unknown}
      */
-    SupportedChains: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+    SupportedChains: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_SOLANA_MAINNET";
     /** TelegramChannel */
     TelegramChannel: {
       /** Webhook Url */
@@ -1335,13 +1399,15 @@ export interface operations {
         contract_address: string;
         /** @description Should we fetch the analyzed implementation contract */
         follow_proxy?: boolean;
+        page?: number;
+        size?: number;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["StorageLayout"];
+          "application/json": components["schemas"]["Page_VariableStorageMapping_"];
         };
       };
       /** @description Bad Request */
@@ -1393,6 +1459,8 @@ export interface operations {
     parameters: {
       query?: {
         func_id?: string;
+        status_filter?: string;
+        type_filter?: string;
         page?: number;
         size?: number;
       };
@@ -1403,6 +1471,42 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["Page_Event_"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Get Stats */
+  get_stats_api_v1_stats_get: {
+    parameters: {
+      query?: {
+        start_time?: string;
+        end_time?: string;
+        type_filter?: string;
+        function_id?: string;
+        webhook_id?: string;
+        page?: number;
+        size?: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_Stat_"];
+        };
+      };
+      /** @description Statistics not found */
+      404: {
+        content: never;
       };
       /** @description Validation Error */
       422: {
@@ -1639,7 +1743,7 @@ export interface operations {
   replay_blocks_api_v1_functions_replay_blocks_post: {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ReplayParams"];
+        "application/json": components["schemas"]["ReplayBlocksParams"];
       };
     };
     responses: {
@@ -1652,6 +1756,43 @@ export interface operations {
         content: never;
       };
       /** @description Function not found */
+      404: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Get Function Stats */
+  get_function_stats_api_v1_functions__id__stats_get: {
+    parameters: {
+      query?: {
+        start_time?: string;
+        end_time?: string;
+        type_filter?: string;
+        page?: number;
+        size?: number;
+      };
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_Stat_"];
+        };
+      };
+      /** @description Function or its statistics not found */
       404: {
         content: never;
       };
@@ -1733,7 +1874,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": unknown;
+          "application/json": Record<string, never>;
         };
       };
       /** @description Data not found */
@@ -2520,7 +2661,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": unknown;
+          "application/json": Record<string, never>;
         };
       };
       /** @description Namespace storage not found */

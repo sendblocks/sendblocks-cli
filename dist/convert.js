@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertHexOrDecimal = exports.convertHexToDecimal = exports.convertDecimalToHex = void 0;
 const convertDecimalToHex = (decimal) => {
-    return decimal.toString(16);
+    return `0x${decimal.toString(16)}`;
 };
 exports.convertDecimalToHex = convertDecimalToHex;
 const convertHexToDecimal = (hex) => {

@@ -1,5 +1,5 @@
 export const convertDecimalToHex = (decimal: number) => {
-    return decimal.toString(16);
+    return `0x${decimal.toString(16)}`;
 }
 
 export const convertHexToDecimal = (hex: string) => {
