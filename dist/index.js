@@ -108,9 +108,11 @@ program
 program
     .command("deploy")
     .description("Deploy your functions to SendBlocks.")
-    .action(() => __awaiter(void 0, void 0, void 0, function* () {
+    .option("--dry-run", "Preview changes only.")
+    .option("--non-interactive", "Deploy without asking for confirmation.")
+    .action((options) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, deploy_1.deploy)();
+        yield (0, deploy_1.deploy)(options);
     }
     catch (error) {
         console.error(error.message);
@@ -121,6 +123,7 @@ program
     .command("destroy")
     .description("Delete the referenced resources on SendBlocks.")
     .option("--dry-run", "Preview destructive changes only.")
+    .option("--non-interactive", "Delete without asking for confirmation.")
     .action((options) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, destroy_1.destroy)(options);

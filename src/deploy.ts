@@ -1,17 +1,20 @@
-import prompts from 'prompts';
+import prompts from "prompts";
 
-import * as functions from './functions';
-import { listYamlFiles, mergeYamlFiles } from './sb-yaml';
-import { generateStateChanges } from './state-diff';
-import * as webhooks from './webhooks';
+import * as functions from "./functions";
+import { listYamlFiles, mergeYamlFiles } from "./sb-yaml";
+import { generateStateChanges } from "./state-diff";
+import * as webhooks from "./webhooks";
 
 type StateComparisonResult = {
-    webhooks: ResourceStateChanges,
-    functions: ResourceStateChanges,
+    webhooks: ResourceStateChanges;
+    functions: ResourceStateChanges;
 };
 
-
-export async function deploy({previewOnly}: { previewOnly?: boolean} = {}) {
+export async function deploy({
+    dryRun,
+    nonInteractive,
+    previewOnly,
+}: { dryRun?: boolean; nonInteractive?: boolean; previewOnly?: boolean } = {}) {
     // merge the yaml files into a single spec
     const spec = await mergeYamlFiles(listYamlFiles());
 
@@ -23,69 +26,112 @@ export async function deploy({previewOnly}: { previewOnly?: boolean} = {}) {
         return;
     }
 
-    if (stateChanges.webhooks.added.length === 0 && stateChanges.functions.added.length === 0 &&
-        stateChanges.webhooks.changed.length === 0 && stateChanges.functions.changed.length === 0) {
-        console.log('No changes to deploy');
+    if (dryRun) {
+        console.log("Dry-run complete! No resources were destroyed.");
         return;
     }
 
-    // confirm changes with the user
-    const confirm = await prompts({
-        type: 'confirm',
-        name: 'value',
-        message: 'Please confirm that you have reviewed the changes and want to proceed with the deployment',
-    });
+    if (
+        stateChanges.webhooks.added.length === 0 &&
+        stateChanges.functions.added.length === 0 &&
+        stateChanges.webhooks.changed.length === 0 &&
+        stateChanges.functions.changed.length === 0
+    ) {
+        console.log("No changes to deploy");
+        return;
+    }
 
-    if (confirm.value) {
+    let confirm;
+    if (!nonInteractive) {
+        // confirm changes with the user
+        confirm = await prompts({
+            type: "confirm",
+            name: "value",
+            message: "Please confirm that you have reviewed the changes and want to proceed with the deployment",
+        });
+    }
+
+    if (nonInteractive || confirm?.value) {
         // deploy the changes
-        console.log('Deploying changes...\n');
+        console.log("Deploying changes...\n");
 
         const webhookResults = await webhooks.deploy(stateChanges.webhooks);
         const functionResults = await functions.deploy(stateChanges.functions, webhookResults);
 
-        console.log('\nDeployment complete!');
+        console.log("\nDeployment complete!");
 
-        console.log('\nWebhook deployment results:')
-        console.table(webhookResults, ['webhook_name', 'webhook_id', 'deployed', 'skipped', 'response']);
-        console.log('Function deployment results:')
-        console.table(functionResults, ['function_name', 'function_id', 'deployed', 'skipped', 'response']);
+        console.log("\nWebhook deployment results:");
+        console.table(webhookResults, ["webhook_name", "webhook_id", "deployed", "skipped", "response"]);
+        console.log("Function deployment results:");
+        console.table(functionResults, ["function_name", "function_id", "deployed", "skipped", "response"]);
     }
 }
 
 function printStateChanges(stateChanges: StateComparisonResult) {
     // print a table showing the differences between the states
-    console.log('Webhooks:');
+    console.log("Webhooks:");
     if (stateChanges.webhooks.added.length > 0) {
-        console.log(' - To be created:');
-        console.table(stateChanges.webhooks.added, ['webhook_name', 'url']);
+        console.log(" - To be created:");
+        console.table(stateChanges.webhooks.added, ["webhook_name", "url"]);
     }
     if (stateChanges.webhooks.changed.length > 0) {
-        console.log(' - Changed:');
-        console.table(stateChanges.webhooks.changed, ['webhook_name', 'url', 'webhook_id', 'changes']);
+        console.log(" - Changed:");
+        console.table(stateChanges.webhooks.changed, ["webhook_name", "url", "webhook_id", "changes"]);
     }
     if (stateChanges.webhooks.unchanged.length > 0) {
-        console.log(' - Unchanged:');
-        console.table(stateChanges.webhooks.unchanged, ['webhook_name', 'url', 'webhook_id']);
+        console.log(" - Unchanged:");
+        console.table(stateChanges.webhooks.unchanged, ["webhook_name", "url", "webhook_id"]);
     }
     if (stateChanges.webhooks.unreferenced.length > 0) {
-        console.log(' - Unreferenced:');
-        console.table(stateChanges.webhooks.unreferenced, ['webhook_name', 'url', 'webhook_id']);
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.webhooks.unreferenced, ["webhook_name", "url", "webhook_id"]);
     }
-    console.log('Functions:');
+    console.log("Functions:");
     if (stateChanges.functions.added.length > 0) {
-        console.log(' - To be created:');
-        console.table(stateChanges.functions.added, ['function_name', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
+        console.log(" - To be created:");
+        console.table(stateChanges.functions.added, [
+            "function_name",
+            "chain_id",
+            "trigger_types",
+            "webhook",
+            "is_enabled",
+            "should_send_std_streams",
+        ]);
     }
     if (stateChanges.functions.changed.length > 0) {
-        console.log(' - Changed:');
-        console.table(stateChanges.functions.changed, ['function_name', 'function_id', 'chain_id', 'webhook', 'should_send_std_streams', 'changes']);
+        console.log(" - Changed:");
+        console.table(stateChanges.functions.changed, [
+            "function_name",
+            "function_id",
+            "chain_id",
+            "webhook",
+            "is_enabled",
+            "should_send_std_streams",
+            "changes",
+        ]);
     }
     if (stateChanges.functions.unchanged.length > 0) {
-        console.log(' - Unchanged:');
-        console.table(stateChanges.functions.unchanged, ['function_name', 'function_id', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
+        console.log(" - Unchanged:");
+        console.table(stateChanges.functions.unchanged, [
+            "function_name",
+            "function_id",
+            "chain_id",
+            "trigger_types",
+            "webhook",
+            "is_enabled",
+            "should_send_std_streams",
+        ]);
     }
     if (stateChanges.functions.unreferenced.length > 0) {
-        console.log(' - Unreferenced:');
-        console.table(stateChanges.functions.unreferenced, ['function_name', 'function_id', 'chain_id', 'trigger_types', 'webhook', 'should_send_std_streams']);
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.functions.unreferenced, [
+            "function_name",
+            "function_id",
+            "chain_id",
+            "trigger_types",
+            "webhook",
+            "is_enabled",
+            "should_send_std_streams",
+        ]);
     }
 }

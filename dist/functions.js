@@ -13,22 +13,22 @@ exports.destroy = exports.deploy = exports.deleteFunction = exports.getFunctionC
 const fetcher_1 = require("./fetcher");
 const function_triggers_1 = require("./function-triggers");
 function convertFunctionToBase64(functionCode) {
-    return Buffer.from(functionCode).toString('base64');
+    return Buffer.from(functionCode).toString("base64");
 }
 exports.convertFunctionToBase64 = convertFunctionToBase64;
 function convertBase64ToFunction(base64Code) {
-    return Buffer.from(base64Code, 'base64').toString('utf-8');
+    return Buffer.from(base64Code, "base64").toString("utf-8");
 }
 exports.convertBase64ToFunction = convertBase64ToFunction;
 function generateFunctionsApi() {
     return __awaiter(this, void 0, void 0, function* () {
         const fetcher = yield (0, fetcher_1.generateFetcher)();
         const api = {
-            createFunction: fetcher.path("/api/v1/functions").method('post').create(),
-            listFunctions: fetcher.path("/api/v1/functions").method('get').create(),
-            getFunctionCode: fetcher.path("/api/v1/functions/{id}/code").method('get').create(),
-            patchFunction: fetcher.path("/api/v1/functions/{id}").method('patch').create(),
-            deleteFunction: fetcher.path("/api/v1/functions/{id}").method('delete').create(),
+            createFunction: fetcher.path("/api/v1/functions").method("post").create(),
+            listFunctions: fetcher.path("/api/v1/functions").method("get").create(),
+            getFunctionCode: fetcher.path("/api/v1/functions/{id}/code").method("get").create(),
+            patchFunction: fetcher.path("/api/v1/functions/{id}").method("patch").create(),
+            deleteFunction: fetcher.path("/api/v1/functions/{id}").method("delete").create(),
         };
         return api;
     });
@@ -36,6 +36,8 @@ function generateFunctionsApi() {
 function isFunctionChanged(name, sendblocksFunction, specFunction) {
     return (sendblocksFunction.chain_id !== specFunction.chain_id ||
         sendblocksFunction.code !== specFunction.code ||
+        sendblocksFunction.is_enabled !== specFunction.is_enabled ||
+        sendblocksFunction.should_send_std_streams !== specFunction.should_send_std_streams ||
         (0, function_triggers_1.areFunctionTriggersChanged)(sendblocksFunction.triggers, specFunction.triggers) ||
         sendblocksFunction.webhook_id !== specFunction.webhook_id);
 }
@@ -54,7 +56,6 @@ function listFunctions() {
     });
 }
 exports.listFunctions = listFunctions;
-;
 function getFunctionDictionary() {
     return __awaiter(this, void 0, void 0, function* () {
         const returnObject = {};
@@ -102,8 +103,7 @@ function deleteFunction(functionName) {
 exports.deleteFunction = deleteFunction;
 function findWebhookIdInDeploymentResults(webhookName, webhookDeploymentResults) {
     var _a;
-    return (_a = webhookDeploymentResults
-        .find((webhook) => webhook.webhook_name === webhookName)) === null || _a === void 0 ? void 0 : _a.webhook_id;
+    return (_a = webhookDeploymentResults.find((webhook) => webhook.webhook_name === webhookName)) === null || _a === void 0 ? void 0 : _a.webhook_id;
 }
 function deploy(stateChanges, webhookDeploymentResults) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -154,13 +154,48 @@ function deploy(stateChanges, webhookDeploymentResults) {
             }
         }
         for (const updatedFunction of stateChanges.changed) {
-            console.log(`Skipping function ${updatedFunction.function_name}...`);
-            results.push({
-                function_name: updatedFunction.function_name,
-                function_id: updatedFunction.function_id,
-                skipped: true,
-                response: `Function updates not yet supported`,
-            });
+            // look up function's webhook id, if it's not available, skip this function
+            const webhookName = updatedFunction.webhook;
+            const webhookId = findWebhookIdInDeploymentResults(webhookName, webhookDeploymentResults);
+            if (!webhookId) {
+                console.log(`Skipping function ${updatedFunction.function_name}...`);
+                results.push({
+                    skipped: true,
+                    function_name: updatedFunction.function_name,
+                    response: `Webhook ${webhookName} not found`,
+                });
+            }
+            else {
+                console.log(`Updating function ${updatedFunction.function_name}...`);
+                try {
+                    const response = yield api.patchFunction({
+                        id: updatedFunction.function_id,
+                        function_name: updatedFunction.function_name,
+                        is_enabled: updatedFunction.is_enabled,
+                        triggers: updatedFunction.triggers,
+                        webhook_id: webhookId,
+                        function_code: convertFunctionToBase64(updatedFunction.code),
+                        should_send_std_streams: updatedFunction.should_send_std_streams,
+                    });
+                    if (response.ok) {
+                        results.push({
+                            function_name: updatedFunction.function_name,
+                            deployed: true,
+                        });
+                    }
+                    else {
+                        throw new Error(`${response.status} ${response}`);
+                    }
+                }
+                catch (error) {
+                    results.push({
+                        deployed: false,
+                        function_name: updatedFunction.function_name,
+                        response: `${error}`,
+                    });
+                    throw new Error(`Error occurred while updating function ${updatedFunction.name}: ${error}`);
+                }
+            }
         }
         for (const unchangedFunction of [...stateChanges.unchanged, ...stateChanges.unreferenced]) {
             results.push({

@@ -43,7 +43,7 @@ const state_diff_1 = require("./state-diff");
 const webhooks = __importStar(require("./webhooks"));
 // destroy --dry-run
 function destroy() {
-    return __awaiter(this, arguments, void 0, function* ({ dryRun } = {}) {
+    return __awaiter(this, arguments, void 0, function* ({ dryRun, nonInteractive } = {}) {
         // merge the yaml files into a single spec
         const spec = yield (0, sb_yaml_1.mergeYamlFiles)((0, sb_yaml_1.listYamlFiles)());
         const stateChanges = yield (0, state_diff_1.generateStateChanges)(spec);
@@ -57,13 +57,16 @@ function destroy() {
             console.log('No resources to destroy');
             return;
         }
-        // confirm changes with the user
-        const confirm = yield (0, prompts_1.default)({
-            type: 'confirm',
-            name: 'value',
-            message: 'Please confirm that you have reviewed the changes and want to proceed with destroying the resources',
-        });
-        if (confirm.value) {
+        let confirm;
+        if (!nonInteractive) {
+            // confirm changes with the user
+            confirm = yield (0, prompts_1.default)({
+                type: 'confirm',
+                name: 'value',
+                message: 'Please confirm that you have reviewed the changes and want to proceed with destroying the resources',
+            });
+        }
+        if (nonInteractive || (confirm === null || confirm === void 0 ? void 0 : confirm.value)) {
             // deploy the changes
             console.log('Deploying changes...\n');
             const functionResults = yield functions.destroy(stateChanges.functions);

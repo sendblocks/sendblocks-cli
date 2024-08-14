@@ -60,122 +60,19 @@ export interface paths {
     /** Run Playground */
     post: operations["run_playground_api_v1_playground_run_post"];
   };
+  "/api/v1/samples/{chain_id}-{trigger_type}": {
+    /** Get Default Sample */
+    get: operations["get_default_sample_api_v1_samples__chain_id___trigger_type__get"];
+  };
+  "/api/v1/samples": {
+    /** Get Sample */
+    post: operations["get_sample_api_v1_samples_post"];
+  };
   "/public/{id}": {
     /** Get Public Share */
     get: operations["get_public_share_public__id__get"];
     /** Public Shares Options Handler */
     options: operations["public_shares_options_handler_public__id__options"];
-  };
-  "/api/v1/risk/depeg/subscriptions": {
-    /**
-     * Get Depegging Subscriptions
-     * @description Get all depegging subscriptions
-     */
-    get: operations["get_depegging_subscriptions_api_v1_risk_depeg_subscriptions_get"];
-    /**
-     * Create Depegging Subscription
-     * @description Create a new depegging subscription
-     */
-    post: operations["create_depegging_subscription_api_v1_risk_depeg_subscriptions_post"];
-  };
-  "/api/v1/risk/depeg/subscriptions/{subscription_id}": {
-    /**
-     * Delete Depegging Subscription
-     * @description Delete a depegging subscription
-     */
-    delete: operations["delete_depegging_subscription_api_v1_risk_depeg_subscriptions__subscription_id__delete"];
-  };
-  "/api/v1/risk/depeg/events": {
-    /**
-     * Get Depegging Events
-     * @description Get all depegging events for a specific time period
-     */
-    get: operations["get_depegging_events_api_v1_risk_depeg_events_get"];
-  };
-  "/api/v1/risk/liquidity/subscriptions": {
-    /**
-     * Get Liquidity Ratio Subscriptions
-     * @description Get all liquidity equality subscriptions
-     */
-    get: operations["get_liquidity_ratio_subscriptions_api_v1_risk_liquidity_subscriptions_get"];
-    /**
-     * Create Liquidity Ratio Subscription
-     * @description Create a new liquidity equality subscription
-     */
-    post: operations["create_liquidity_ratio_subscription_api_v1_risk_liquidity_subscriptions_post"];
-  };
-  "/api/v1/risk/liquidity/subscriptions/{subscription_id}": {
-    /**
-     * Delete Liquidity Ratio Subscription
-     * @description Delete a liquidity equality subscription
-     */
-    delete: operations["delete_liquidity_ratio_subscription_api_v1_risk_liquidity_subscriptions__subscription_id__delete"];
-  };
-  "/api/v1/risk/liquidity/events": {
-    /**
-     * Get Liquidity Equality Events
-     * @description Get all liquidity equality events
-     */
-    get: operations["get_liquidity_equality_events_api_v1_risk_liquidity_events_get"];
-  };
-  "/api/v1/risk/concentration/subscriptions": {
-    /**
-     * Get Concentration Subscriptions
-     * @description Get all concentration risk subscriptions
-     */
-    get: operations["get_concentration_subscriptions_api_v1_risk_concentration_subscriptions_get"];
-    /**
-     * Create Concentration Subscription
-     * @description Create a concentration risk subscription
-     */
-    post: operations["create_concentration_subscription_api_v1_risk_concentration_subscriptions_post"];
-  };
-  "/api/v1/risk/concentration/subscriptions/{subscription_id}": {
-    /**
-     * Delete Concentration Subscription
-     * @description Delete a concentration risk subscription
-     */
-    delete: operations["delete_concentration_subscription_api_v1_risk_concentration_subscriptions__subscription_id__delete"];
-  };
-  "/api/v1/risk/concentration/events": {
-    /**
-     * Get Concentration Events
-     * @description Get concentration risk events
-     */
-    get: operations["get_concentration_events_api_v1_risk_concentration_events_get"];
-  };
-  "/api/v1/risk/anomaly/subscriptions": {
-    /**
-     * Get Anomaly Subscriptions
-     * @description Get all anomaly subscriptions
-     */
-    get: operations["get_anomaly_subscriptions_api_v1_risk_anomaly_subscriptions_get"];
-    /**
-     * Create Anomaly Subscription
-     * @description Create a new anomaly subscription
-     */
-    post: operations["create_anomaly_subscription_api_v1_risk_anomaly_subscriptions_post"];
-  };
-  "/api/v1/risk/anomaly/subscriptions/{subscription_id}": {
-    /**
-     * Delete Anomaly Subscription
-     * @description Delete an anomaly subscription
-     */
-    delete: operations["delete_anomaly_subscription_api_v1_risk_anomaly_subscriptions__subscription_id__delete"];
-  };
-  "/api/v1/risk/anomaly/events": {
-    /**
-     * Get Anomaly Events
-     * @description Get all anomaly events
-     */
-    get: operations["get_anomaly_events_api_v1_risk_anomaly_events_get"];
-  };
-  "/api/v1/risk/events": {
-    /**
-     * Get Risk Events
-     * @description Get all risk events
-     */
-    get: operations["get_risk_events_api_v1_risk_events_get"];
   };
   "/api/v1/rpc_api_keys": {
     /** List Rpc Api Keys */
@@ -228,8 +125,28 @@ export interface paths {
   "/api/v1/webhooks/{id}": {
     /** Get Webhook */
     get: operations["get_webhook_api_v1_webhooks__id__get"];
-    /** Delete Webhooks */
-    delete: operations["delete_webhooks_api_v1_webhooks__id__delete"];
+    /** Delete Webhook */
+    delete: operations["delete_webhook_api_v1_webhooks__id__delete"];
+  };
+  "/api/v1/notifications/templates": {
+    /** Get Templates */
+    get: operations["get_templates_api_v1_notifications_templates_get"];
+    /** Create Template */
+    post: operations["create_template_api_v1_notifications_templates_post"];
+  };
+  "/api/v1/notifications/templates/{template_id}": {
+    /** Get Template */
+    get: operations["get_template_api_v1_notifications_templates__template_id__get"];
+    /** Delete Template */
+    delete: operations["delete_template_api_v1_notifications_templates__template_id__delete"];
+  };
+  "/api/v1/notifications/users/{id}": {
+    /** Delete User */
+    delete: operations["delete_user_api_v1_notifications_users__id__delete"];
+  };
+  "/api/v1/notifications/users": {
+    /** List Users */
+    get: operations["list_users_api_v1_notifications_users_get"];
   };
 }
 
@@ -259,135 +176,17 @@ export interface components {
        * ]
        */
       locations?: components["schemas"]["PydanticAddressLocations"][];
-    };
-    /** AnomalyEvent */
-    AnomalyEvent: {
       /**
-       * Chain
-       * @description Chain which the alert was triggered on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {string}
-       */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
-      /**
-       * Stable Coin
-       * @description The stable coin alerted in the event
-       * @example USDT
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Event Time
-       * Format: date-time
-       * @description The time of the event
-       */
-      event_time: string;
-      /**
-       * Anomaly Type
-       * @description The type of the anomaly
-       * @example NEW_CONTRACT_DEPLOYED
-       */
-      anomaly_type: components["schemas"]["AnomalyType"];
-      /**
-       * Anomaly Data
-       * @description The data of the anomaly
+       * Custom parameters
+       * @description Parameters to be passed to the function when it is triggered by this trigger
        * @example {
-       *   "contract_address": "0x1234567890",
-       *   "deployer": "0x0987654321"
+       *   "key": "value",
+       *   "key2": "value2"
        * }
        */
-      anomaly_data: Record<string, never>;
-    };
-    /**
-     * AnomalyType
-     * @description An enumeration.
-     * @enum {string}
-     */
-    AnomalyType: "LARGE_TRANSFER" | "LARGE_WITHDRAW" | "SUSPICIOUS_ADDRESS_INVOLVEMENT" | "HACK_REPORTED" | "NEW_CONTRACT_DEPLOYED";
-    /**
-     * Chain
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    Chain: "1" | "11155111" | "42161" | "137" | "23448594291968334" | "osmosis-1" | "1313161554" | "56" | "97" | "5000" | "59144" | "solana-mainnet";
-    /** ConcentrationEvent */
-    ConcentrationEvent: {
-      /**
-       * Chain
-       * @description The chain of the event
-       * @example CHAIN_ETH_MAINNET
-       */
-      chain_id: components["schemas"]["SupportedChains"];
-      /**
-       * Stable Coin
-       * @description The stable coin alerted in the event
-       * @example USDC
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Event Time
-       * Format: date-time
-       * @description The time of the event
-       */
-      event_time: string;
-      /**
-       * Holder Address
-       * @description The holder address of the stable coin
-       * @example 0x1234567890
-       */
-      holder_address: string;
-      /**
-       * Concentration
-       * @description The concentration percentage of the stable coin
-       * @example 0.6
-       */
-      concentration: number;
-    };
-    /** ConcentrationRiskGetReply */
-    ConcentrationRiskGetReply: {
-      /**
-       * Subscription ID
-       * @description The ID of the created subscription
-       */
-      subscription_id: string;
-      /**
-       * Chain
-       * @description The chain to subscribe to
-       * @example CHAIN_ETH_MAINNET
-       */
-      chain_id: components["schemas"]["SupportedChains"];
-      /**
-       * Stable Coin
-       * @description The stable coin to be checked against in the subscription
-       * @example USDC
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Threshold
-       * @description The threshold of concentration to trigger the alert
-       * @example 0.6
-       */
-      threshold: number;
-    };
-    /** ConcentrationRiskSubRequest */
-    ConcentrationRiskSubRequest: {
-      /**
-       * Chain
-       * @description The chain to subscribe to
-       * @example CHAIN_ETH_MAINNET
-       */
-      chain_id: components["schemas"]["SupportedChains"];
-      /**
-       * Stable Coin
-       * @description The stable coin to be checked against in the subscription
-       * @example USDC
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Threshold
-       * @description The threshold of concentration to trigger the alert
-       * @example 0.6
-       */
-      threshold: number;
+      custom_parameters?: {
+        [key: string]: string;
+      };
     };
     /** ContractRequest */
     ContractRequest: {
@@ -406,120 +205,28 @@ export interface components {
        */
       contract_address: string;
     };
-    /** CreateAnomalySubRequest */
-    CreateAnomalySubRequest: {
+    /** CreateTemplateRequest */
+    CreateTemplateRequest: {
       /**
-       * Chain
-       * @description Chain for the alert to run on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {unknown}
+       * Function Id
+       * @description The id for an existing function, that implements the template logic
+       * @example 12345678-1234-1234-1234-123456789abc
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
+      function_id: string;
       /**
-       * Stable Coin
-       * @description The stable coin to be checked against in the subscription
-       * @example USDC
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-    };
-    /** CreateDepegSubRequest */
-    CreateDepegSubRequest: {
-      /**
-       * Alert Channel
-       * @description The alert channel to be used for the subscription
-       * @example {
-       *   "url": "https://example.com",
-       *   "secret": "secret"
-       * }
-       */
-      alert_channel: components["schemas"]["WebhookChannel"] | components["schemas"]["TelegramChannel"] | components["schemas"]["SlackChannel"];
-      /**
-       * Chain
-       * @description Chain for the function to run on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {string}
-       */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
-      /**
-       * Stable coin
-       * @description The stable coin to be tracked in the subscription
-       * @example USDT
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Data Sources
-       * @description List of data sources to used for tracking in the subscription
+       * Parameter Names
+       * @description List of Parameters needed for creating a notification instance from this template
        * @example [
-       *   "CHAINLINK_ORACLE",
-       *   "COINGECKO"
+       *   "address",
+       *   "threshold"
        * ]
        */
-      data_sources: components["schemas"]["DataProviders"][];
+      parameter_names?: string[];
       /**
-       * Threshold
-       * @description The threshold value for the subscription
+       * Trigger
+       * @description A user trigger that will be set for every notification instance created from this template. Note that the trigger can contain parameter placeholder. ie $$address$$
        */
-      threshold: number;
-    };
-    /** CreateSubReply */
-    CreateSubReply: {
-      /**
-       * Subscription ID
-       * @description The ID of the created subscription
-       */
-      subscription_id: string;
-    };
-    /**
-     * DEXs
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    DEXs: "UNISWAP" | "SUSHISWAP" | "PANCAKESWAP" | "CURVE";
-    /**
-     * DataProviders
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    DataProviders: "CHAINLINK_ORACLE" | "UNISWAP_ORACLE" | "COINGECKO" | "COINMARKETCAP";
-    /**
-     * DepeggingCauses
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    DepeggingCauses: "MARKET_MANIPULATION" | "LIQUIDITY_ISSUES" | "ORACLE_MANIPULATION" | "SECURITY_ISSUES" | "OTHER";
-    /** DepeggingEvent */
-    DepeggingEvent: {
-      /**
-       * Chain
-       * @description Chain for the function to run on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {string}
-       */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
-      /**
-       * Stable coin
-       * @description The stable coin to be tracked in the subscription
-       * @example USDT
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Event Time
-       * Format: date-time
-       * @description The time of the event
-       */
-      event_time: string;
-      /**
-       * Event Cause
-       * @description The reason of the depegging event
-       * @example ORACLE_MANIPULATION
-       */
-      event_cause: components["schemas"]["DepeggingCauses"];
-      /**
-       * Risk Level
-       * @description The risk level of the event
-       * @example HIGH
-       */
-      risk_level: components["schemas"]["RiskLevels"];
+      user_trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"];
     };
     /** Event */
     Event: {
@@ -529,7 +236,7 @@ export interface components {
        * @example EVENT_TYPE_RUN_FUNCTION
        * @enum {string}
        */
-      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE";
+      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE" | "EVENT_TYPE_FUNCTION_RATE_LIMIT_EXCEEDED" | "EVENT_TYPE_DATA_SEND_QUOTA_EXCEEDED";
       /** Timestamp */
       timestamp?: string;
       /** Payload */
@@ -548,6 +255,17 @@ export interface components {
        * @example 0x04fb42f6b9d37e87d9febc9946d24a6135f9d2435fd0e163eeb1e025817605b2
        */
       event: string;
+      /**
+       * Custom parameters
+       * @description Parameters to be passed to the function when it is triggered by this trigger
+       * @example {
+       *   "key": "value",
+       *   "key2": "value2"
+       * }
+       */
+      custom_parameters?: {
+        [key: string]: string;
+      };
     };
     /** ExecuteFunctionArgs */
     ExecuteFunctionArgs: {
@@ -574,6 +292,8 @@ export interface components {
       should_send_std_streams: boolean;
       /** Function Code */
       function_code: string;
+      /** Function Code File Listing */
+      function_code_file_listing?: Record<string, never>[];
     };
     /** FuncInfoPatch */
     FuncInfoPatch: {
@@ -586,7 +306,6 @@ export interface components {
       /**
        * Is function enabled
        * @description Whether the function will be triggered or not
-       * @default true
        * @example true
        */
       is_enabled?: boolean;
@@ -598,14 +317,13 @@ export interface components {
       webhook_id?: string;
       /**
        * Function code
-       * @description You function code encoded in base 64
+       * @description Your function code (or zip file containing a main.ts / main.js entry point) encoded in base 64
        * @example ZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHRyaWdnZXJIYW5kbGVyKGNvbnRleHQsIGRhdGEpIHsKICAgIHJldHVybiB7ImNvbnRleHQiOiBjb250ZXh0LCAiZGF0YSI6ZGF0YX07Cn0=
        */
       function_code?: string;
       /**
        * Should send stdout and stderr to webhook
        * @description Whether the result of the function stdout and stderr will be sent to the webhook in addition to the result of the function
-       * @default true
        * @example true
        */
       should_send_std_streams?: boolean;
@@ -628,314 +346,44 @@ export interface components {
        * @example 0xbeabacc8
        */
       function: string;
-    };
-    /** GetAnomalyEventsRequest */
-    GetAnomalyEventsRequest: {
       /**
-       * Start Date Time
-       * Format: date-time
-       * @description The start date time for the events
-       */
-      start_data_time: string;
-      /**
-       * End Date Time
-       * Format: date-time
-       * @description The end date time for the events
-       */
-      end_data_time: string;
-      /**
-       * Chains
-       * @description The chain ids originating the events
-       * @example [
-       *   "CHAIN_ETH_MAINNET",
-       *   "CHAIN_ARBITRUM_ONE"
-       * ]
-       */
-      chain_ids: components["schemas"]["SupportedChains"][];
-      /**
-       * Stable Coins
-       * @description The stable coins to retrieve events for
-       * @example [
-       *   "USDT",
-       *   "USDC"
-       * ]
-       */
-      stablecoin_ids: components["schemas"]["StableCoins"][];
-    };
-    /** GetAnomalySubReply */
-    GetAnomalySubReply: {
-      /**
-       * Subscription ID
-       * @description The ID of the created subscription
-       */
-      subscription_id: string;
-      /**
-       * Chain
-       * @description Chain for the alert to run on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {unknown}
-       */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
-      /**
-       * Stable Coin
-       * @description The stable coin to be checked against in the subscription
-       * @example USDC
-       */
-      stablecoin_id: components["schemas"]["StableCoins"];
-    };
-    /** GetConcentrationEventsRequest */
-    GetConcentrationEventsRequest: {
-      /**
-       * Start Date Time
-       * Format: date-time
-       * @description The start date time for the events
-       */
-      start_data_time: string;
-      /**
-       * End Date Time
-       * Format: date-time
-       * @description The end date time for the events
-       */
-      end_data_time: string;
-      /**
-       * Chains
-       * @description The chain ids originating the events
-       * @example [
-       *   "CHAIN_ETH_MAINNET",
-       *   "CHAIN_POLYGON_MAINNET"
-       * ]
-       */
-      chain_ids: components["schemas"]["SupportedChains"][];
-      /**
-       * Stable Coins
-       * @description The stable coins to retrieve events for
-       * @example [
-       *   "DAI",
-       *   "USDC"
-       * ]
-       */
-      stablecoin_ids: components["schemas"]["StableCoins"][];
-    };
-    /** GetDepegSubscriptionReply */
-    GetDepegSubscriptionReply: {
-      /**
-       * Subscription ID
-       * @description The ID of the created subscription
-       */
-      subscription_id: string;
-      /**
-       * Alert Channel
-       * @description The alert channel to be used for the subscription
+       * Custom parameters
+       * @description Parameters to be passed to the function when it is triggered by this trigger
        * @example {
-       *   "url": "https://example.com",
-       *   "secret": "secret"
+       *   "key": "value",
+       *   "key2": "value2"
        * }
        */
-      alert_channel: components["schemas"]["WebhookChannel"] | components["schemas"]["TelegramChannel"] | components["schemas"]["SlackChannel"];
+      custom_parameters?: {
+        [key: string]: string;
+      };
+    };
+    /** GetSampleRequest */
+    GetSampleRequest: {
       /**
        * Chain
        * @description Chain for the function to run on
+       * @default CHAIN_ETH_MAINNET
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
+      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_FANTOM_MAINNET" | "CHAIN_BASE_MAINNET";
       /**
-       * Stable coin
-       * @description The stable coin to be tracked in the subscription
-       * @example USDT
+       * Trigger
+       * @description Trigger that will invoke the function
        */
-      stablecoin_id: components["schemas"]["StableCoins"];
+      trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"];
       /**
-       * Data Sources
-       * @description List of data sources to used for tracking in the subscription
-       * @example [
-       *   "CHAINLINK_ORACLE",
-       *   "COINGECKO"
-       * ]
+       * Block number
+       * @description Block number to samples trigger from
+       * @example 123456
        */
-      data_sources: components["schemas"]["DataProviders"][];
-      /**
-       * Threshold
-       * @description The threshold value for the subscription
-       */
-      threshold: number;
-    };
-    /** GetDepeggingEventsRequest */
-    GetDepeggingEventsRequest: {
-      /**
-       * Chains
-       * @description The chain ids originating the events
-       * @example [
-       *   "CHAIN_ETH_MAINNET",
-       *   "CHAIN_BNB_MAINNET"
-       * ]
-       */
-      chain_ids: components["schemas"]["SupportedChains"][];
-      /**
-       * Start Date Time
-       * Format: date-time
-       * @description The start date time for the events
-       */
-      start_data_time: string;
-      /**
-       * End Date Time
-       * Format: date-time
-       * @description The end date time for the events
-       */
-      end_data_time: string;
-      /**
-       * Stable Coins
-       * @description List of stable coins to be included in the events
-       * @example [
-       *   "USDT",
-       *   "USDC"
-       * ]
-       */
-      stable_coins: components["schemas"]["StableCoins"][];
-    };
-    /** GetLiqSubReply */
-    GetLiqSubReply: {
-      /**
-       * Subscription ID
-       * @description The ID of the created subscription
-       */
-      subscription_id: string;
-      /**
-       * Chain
-       * @description Chain for the alert to run on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {unknown}
-       */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
-      /**
-       * Alerted Stable Coin
-       * @description The stable coin to be tracked in the subscription
-       * @example USDT
-       */
-      alerted_stable_coin: components["schemas"]["StableCoins"];
-      /**
-       * Checked Stable Coin
-       * @description The stable coin to be checked against in the subscription
-       * @example USDC
-       */
-      checked_stable_coin: components["schemas"]["StableCoins"];
-      /**
-       * DEX
-       * @description The DEX to be used for the pool tracked in the subscription
-       * @example UNISWAP
-       */
-      dex: components["schemas"]["DEXs"];
-      /**
-       * Liquidity Ratio Threshold
-       * @description The threshold for the liquidity ratio
-       * @example 0.9
-       */
-      liquidity_ratio_threshold: number;
-    };
-    /** GetLiquidityEventsRequest */
-    GetLiquidityEventsRequest: {
-      /**
-       * Start Date Time
-       * Format: date-time
-       * @description The start date time for the events
-       */
-      start_data_time: string;
-      /**
-       * End Date Time
-       * Format: date-time
-       * @description The end date time for the events
-       */
-      end_data_time: string;
-      /**
-       * Chains
-       * @description The chain ids originating the events
-       * @example [
-       *   "CHAIN_ETH_MAINNET",
-       *   "CHAIN_ARBITRUM_ONE"
-       * ]
-       */
-      chain_ids: components["schemas"]["SupportedChains"][];
-      /**
-       * Stable Coins
-       * @description The stable coins to retrieve events for
-       * @example [
-       *   "USDT",
-       *   "USDC"
-       * ]
-       */
-      stablecoin_ids: components["schemas"]["StableCoins"][];
-    };
-    /** GetRiskEventsRequest */
-    GetRiskEventsRequest: {
-      /**
-       * Start Date Time
-       * Format: date-time
-       * @description The start date time for the events
-       */
-      start_data_time: string;
-      /**
-       * End Date Time
-       * Format: date-time
-       * @description The end date time for the events
-       */
-      end_data_time: string;
-      /**
-       * Chains
-       * @description The chain ids originating the events
-       * @example [
-       *   "CHAIN_ETH_MAINNET",
-       *   "CHAIN_ARBITRUM_ONE"
-       * ]
-       */
-      chain_ids: components["schemas"]["SupportedChains"][];
-      /**
-       * Stable Coins
-       * @description The stable coins to retrieve events for
-       * @example [
-       *   "USDT",
-       *   "USDC"
-       * ]
-       */
-      stablecoin_ids: components["schemas"]["StableCoins"][];
+      block_number: number;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
-    };
-    /** LiquidityEqualityEvent */
-    LiquidityEqualityEvent: {
-      /**
-       * Chain
-       * @description Chain which the alert was triggered on
-       * @example CHAIN_ETH_MAINNET
-       * @enum {string}
-       */
-      chain_id: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
-      /**
-       * Stable coin
-       * @description The stable coin alerted in the event
-       * @example USDT
-       */
-      alerted_stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Checked Stable Coin
-       * @description The stable coin to be checked against in the event
-       * @example USDC
-       */
-      checked_stablecoin_id: components["schemas"]["StableCoins"];
-      /**
-       * Event Time
-       * Format: date-time
-       * @description The time of the event
-       */
-      event_time: string;
-      /**
-       * Liquidity Equality Ratio
-       * @description The liquidity equality ratio
-       * @example 0.9
-       */
-      liquidity_equality_ration: number;
     };
     /** New Block Trigger */
     NewBlockTriggerData: {
@@ -944,6 +392,17 @@ export interface components {
        * @enum {string}
        */
       type: "TRIGGER_TYPE_NEW_BLOCK";
+      /**
+       * Custom parameters
+       * @description Parameters to be passed to the function when it is triggered by this trigger
+       * @example {
+       *   "key": "value",
+       *   "key2": "value2"
+       * }
+       */
+      custom_parameters?: {
+        [key: string]: string;
+      };
     };
     /** New Contract Trigger */
     NewContractTriggerData: {
@@ -952,6 +411,17 @@ export interface components {
        * @enum {string}
        */
       type: "TRIGGER_TYPE_NEW_CONTRACT";
+      /**
+       * Custom parameters
+       * @description Parameters to be passed to the function when it is triggered by this trigger
+       * @example {
+       *   "key": "value",
+       *   "key2": "value2"
+       * }
+       */
+      custom_parameters?: {
+        [key: string]: string;
+      };
     };
     /** Page[Event] */
     Page_Event_: {
@@ -1088,7 +558,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
+      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_FANTOM_MAINNET" | "CHAIN_BASE_MAINNET";
       /**
        * StartBlockNumber
        * @description The first block number that will be replayed
@@ -1106,12 +576,6 @@ export interface components {
        */
       xl_flag?: boolean;
     };
-    /**
-     * RiskLevels
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    RiskLevels: "LOW" | "MEDIUM" | "HIGH";
     /** RpcApiKeyId */
     RpcApiKeyId: {
       /** Api Key Id */
@@ -1141,7 +605,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET";
+      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_FANTOM_MAINNET" | "CHAIN_BASE_MAINNET";
       /**
        * Triggers
        * @description Triggers that will invoke the function
@@ -1161,7 +625,7 @@ export interface components {
       function_name: string;
       /**
        * Function code
-       * @description You function code encoded in base 64
+       * @description Your function code encoded in base 64
        * @example ZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHRyaWdnZXJIYW5kbGVyKGNvbnRleHQsIGRhdGEpIHsKICAgIHJldHVybiB7ImNvbnRleHQiOiBjb250ZXh0LCAiZGF0YSI6ZGF0YX07Cn0=
        */
       function_code: string;
@@ -1224,17 +688,13 @@ export interface components {
       /** Webhook Id */
       webhook_id?: string;
     };
-    /** SlackChannel */
-    SlackChannel: {
-      /** Webhook Url */
-      webhook_url: string;
+    /** SbUserInfo */
+    SbUserInfo: {
+      /** Sb User Id */
+      sb_user_id: string;
+      /** Wallet Address */
+      wallet_address: string;
     };
-    /**
-     * StableCoins
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    StableCoins: "USDT" | "USDC" | "DAI";
     /** Stat */
     Stat: {
       /** Tenant Id */
@@ -1256,7 +716,7 @@ export interface components {
        * @example EVENT_TYPE_RUN_FUNCTION
        * @enum {string}
        */
-      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE";
+      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE" | "EVENT_TYPE_FUNCTION_RATE_LIMIT_EXCEEDED" | "EVENT_TYPE_DATA_SEND_QUOTA_EXCEEDED";
       /** Func Id */
       func_id?: string;
       /** Webhook Id */
@@ -1294,6 +754,17 @@ export interface components {
       follow_proxy?: boolean;
       /** Variable */
       variable: components["schemas"]["StorageVariableTrigger"] | components["schemas"]["StorageSlotTrigger"];
+      /**
+       * Custom parameters
+       * @description Parameters to be passed to the function when it is triggered by this trigger
+       * @example {
+       *   "key": "value",
+       *   "key2": "value2"
+       * }
+       */
+      custom_parameters?: {
+        [key: string]: string;
+      };
     };
     /** By Variable Name */
     StorageVariableTrigger: {
@@ -1304,16 +775,18 @@ export interface components {
        */
       variable_name: string;
     };
-    /**
-     * SupportedChains
-     * @description An enumeration.
-     * @enum {unknown}
-     */
-    SupportedChains: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_AURORA_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_SOLANA_MAINNET";
-    /** TelegramChannel */
-    TelegramChannel: {
-      /** Webhook Url */
-      webhook_url: string;
+    /** TemplateInfo */
+    TemplateInfo: {
+      /** Template Id */
+      template_id: string;
+      /** Tenant Id */
+      tenant_id: string;
+      /** Function Id */
+      function_id: string;
+      /** User Trigger */
+      user_trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"];
+      /** Parameter Names */
+      parameter_names: string[];
     };
     /** Usage */
     Usage: {
@@ -1350,13 +823,6 @@ export interface components {
       first_slot?: string;
       /** Last Slot */
       last_slot?: string;
-    };
-    /** WebhookChannel */
-    WebhookChannel: {
-      /** Url */
-      url: string;
-      /** Secret */
-      secret: string;
     };
     /** WebhookInfo */
     WebhookInfo: {
@@ -1684,7 +1150,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Function code */
+      /** @description Function code or zip file */
       200: {
         content: {
           "application/octet-stream": unknown;
@@ -1863,6 +1329,47 @@ export interface operations {
       };
     };
   };
+  /** Get Default Sample */
+  get_default_sample_api_v1_samples__chain_id___trigger_type__get: {
+    parameters: {
+      path: {
+        chain_id: string;
+        trigger_type: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Sample */
+  get_sample_api_v1_samples_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GetSampleRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   /** Get Public Share */
   get_public_share_public__id__get: {
     parameters: {
@@ -1912,515 +1419,6 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
         };
-      };
-    };
-  };
-  /**
-   * Get Depegging Subscriptions
-   * @description Get all depegging subscriptions
-   */
-  get_depegging_subscriptions_api_v1_risk_depeg_subscriptions_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetDepegSubscriptionReply"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Create Depegging Subscription
-   * @description Create a new depegging subscription
-   */
-  create_depegging_subscription_api_v1_risk_depeg_subscriptions_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateDepegSubRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["CreateSubReply"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Delete Depegging Subscription
-   * @description Delete a depegging subscription
-   */
-  delete_depegging_subscription_api_v1_risk_depeg_subscriptions__subscription_id__delete: {
-    parameters: {
-      path: {
-        subscription_id: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      204: {
-        content: never;
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Depegging Events
-   * @description Get all depegging events for a specific time period
-   */
-  get_depegging_events_api_v1_risk_depeg_events_get: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["GetDepeggingEventsRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["DepeggingEvent"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Liquidity Ratio Subscriptions
-   * @description Get all liquidity equality subscriptions
-   */
-  get_liquidity_ratio_subscriptions_api_v1_risk_liquidity_subscriptions_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetLiqSubReply"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Create Liquidity Ratio Subscription
-   * @description Create a new liquidity equality subscription
-   */
-  create_liquidity_ratio_subscription_api_v1_risk_liquidity_subscriptions_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateDepegSubRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["CreateSubReply"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Delete Liquidity Ratio Subscription
-   * @description Delete a liquidity equality subscription
-   */
-  delete_liquidity_ratio_subscription_api_v1_risk_liquidity_subscriptions__subscription_id__delete: {
-    parameters: {
-      path: {
-        subscription_id: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      204: {
-        content: never;
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Liquidity Equality Events
-   * @description Get all liquidity equality events
-   */
-  get_liquidity_equality_events_api_v1_risk_liquidity_events_get: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["GetLiquidityEventsRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["LiquidityEqualityEvent"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Concentration Subscriptions
-   * @description Get all concentration risk subscriptions
-   */
-  get_concentration_subscriptions_api_v1_risk_concentration_subscriptions_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["ConcentrationRiskGetReply"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Create Concentration Subscription
-   * @description Create a concentration risk subscription
-   */
-  create_concentration_subscription_api_v1_risk_concentration_subscriptions_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ConcentrationRiskSubRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["CreateSubReply"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Delete Concentration Subscription
-   * @description Delete a concentration risk subscription
-   */
-  delete_concentration_subscription_api_v1_risk_concentration_subscriptions__subscription_id__delete: {
-    parameters: {
-      path: {
-        subscription_id: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      204: {
-        content: never;
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Concentration Events
-   * @description Get concentration risk events
-   */
-  get_concentration_events_api_v1_risk_concentration_events_get: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["GetConcentrationEventsRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["ConcentrationEvent"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Anomaly Subscriptions
-   * @description Get all anomaly subscriptions
-   */
-  get_anomaly_subscriptions_api_v1_risk_anomaly_subscriptions_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetAnomalySubReply"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Create Anomaly Subscription
-   * @description Create a new anomaly subscription
-   */
-  create_anomaly_subscription_api_v1_risk_anomaly_subscriptions_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateAnomalySubRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["CreateSubReply"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Delete Anomaly Subscription
-   * @description Delete an anomaly subscription
-   */
-  delete_anomaly_subscription_api_v1_risk_anomaly_subscriptions__subscription_id__delete: {
-    parameters: {
-      path: {
-        subscription_id: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      204: {
-        content: never;
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Anomaly Events
-   * @description Get all anomaly events
-   */
-  get_anomaly_events_api_v1_risk_anomaly_events_get: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["GetAnomalyEventsRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["AnomalyEvent"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /**
-   * Get Risk Events
-   * @description Get all risk events
-   */
-  get_risk_events_api_v1_risk_events_get: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["GetRiskEventsRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": (components["schemas"]["AnomalyEvent"] | components["schemas"]["LiquidityEqualityEvent"] | components["schemas"]["DepeggingEvent"])[];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
       };
     };
   };
@@ -2889,8 +1887,8 @@ export interface operations {
       };
     };
   };
-  /** Delete Webhooks */
-  delete_webhooks_api_v1_webhooks__id__delete: {
+  /** Delete Webhook */
+  delete_webhook_api_v1_webhooks__id__delete: {
     parameters: {
       path: {
         id: string;
@@ -2916,6 +1914,114 @@ export interface operations {
       /** @description Internal Server Error */
       500: {
         content: never;
+      };
+    };
+  };
+  /** Get Templates */
+  get_templates_api_v1_notifications_templates_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["TemplateInfo"][];
+        };
+      };
+    };
+  };
+  /** Create Template */
+  create_template_api_v1_notifications_templates_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateTemplateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Template */
+  get_template_api_v1_notifications_templates__template_id__get: {
+    parameters: {
+      path: {
+        template_id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["TemplateInfo"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete Template */
+  delete_template_api_v1_notifications_templates__template_id__delete: {
+    parameters: {
+      path: {
+        template_id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete User */
+  delete_user_api_v1_notifications_users__id__delete: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** List Users */
+  list_users_api_v1_notifications_users_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SbUserInfo"][];
+        };
       };
     };
   };

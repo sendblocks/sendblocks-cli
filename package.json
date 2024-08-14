@@ -1,7 +1,7 @@
 {
   "name": "sendblocks-cli",
   "author": "SendBlocks",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A CLI tool for interacting with the SendBlocks platform.",
   "main": "dist/index.js",
   "bin": {
@@ -17,7 +17,8 @@
   "homepage": "https://github.com/sendblocks/sendblocks-cli#readme",
   "scripts": {
     "build": "rm -rf dist/* && npx tsc && chmod +x dist/index.js",
-    "import-spec:local": "npx openapi-typescript http://localhost:8001/openapi.json --output ./src/types/api.ts",
+    "import-spec": "openapi-typescript --output ./src/types/api.ts",
+    "import-spec:local": "openapi-typescript --output ./src/types/api.ts http://localhost:8001/openapi.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -36,6 +37,7 @@
     "yaml": "^2.4.1"
   },
   "devDependencies": {
+    "openapi-typescript": "^6.7.6",
     "@types/node": "^20.11.30",
     "typescript": "^5.4.3"
   }

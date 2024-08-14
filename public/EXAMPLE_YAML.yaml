@@ -9,6 +9,7 @@ functions:
   - function_name:
       chain_id: CHAIN_ETH_SEPOLIA
       code: functions/echo_function.ts
+      is_enabled: true
       should_send_std_streams: true
       triggers:
         - type: TRIGGER_TYPE_ADDRESS

@@ -12,7 +12,7 @@ type StateComparisonResult = {
 
 
 // destroy --dry-run
-export async function destroy({dryRun}: { dryRun?: boolean} = {}) {
+export async function destroy({dryRun, nonInteractive}: { dryRun?: boolean, nonInteractive?: boolean} = {}) {
     // merge the yaml files into a single spec
     const spec = await mergeYamlFiles(listYamlFiles());
 
@@ -31,14 +31,17 @@ export async function destroy({dryRun}: { dryRun?: boolean} = {}) {
         return;
     }
 
-    // confirm changes with the user
-    const confirm = await prompts({
-        type: 'confirm',
-        name: 'value',
-        message: 'Please confirm that you have reviewed the changes and want to proceed with destroying the resources',
-    });
+    let confirm;
+    if (!nonInteractive) {
+        // confirm changes with the user
+        confirm = await prompts({
+            type: 'confirm',
+            name: 'value',
+            message: 'Please confirm that you have reviewed the changes and want to proceed with destroying the resources',
+        });
+    }
 
-    if (confirm.value) {
+    if (nonInteractive || confirm?.value) {
         // deploy the changes
         console.log('Deploying changes...\n');
 

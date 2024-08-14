@@ -79,9 +79,11 @@ program
 program
     .command("deploy")
     .description("Deploy your functions to SendBlocks.")
-    .action(async () => {
+    .option("--dry-run", "Preview changes only.")
+    .option("--non-interactive", "Deploy without asking for confirmation.")
+    .action(async (options) => {
         try {
-            await deploy();
+            await deploy(options);
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);
@@ -92,6 +94,7 @@ program
     .command("destroy")
     .description("Delete the referenced resources on SendBlocks.")
     .option("--dry-run", "Preview destructive changes only.")
+    .option("--non-interactive", "Delete without asking for confirmation.")
     .action(async (options) => {
         try {
             await destroy(options);

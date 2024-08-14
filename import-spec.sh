@@ -46,7 +46,7 @@ if [ "$skip_gen_spec" = true ]; then
     echo "sendblocks-cli import: skipping generating the spec"
 else
     pushd $ROOT_DIR
-        ./gen_openapi_spec.sh
+        ./gen_openapi_spec.sh $spec_location
     popd
 fi
 
@@ -57,6 +57,6 @@ echo "sendblocks-cli installing npm dependencies..."
 npm ci
 
 echo "sendblocks-cli importing spec from ${spec_location}..."
-npx openapi-typescript "$spec_location" --output ./src/types/api.ts
+npm run import-spec -- "$spec_location"
 
 npm run build
