@@ -1,8 +1,8 @@
-import { Fetcher } from 'openapi-typescript-fetch';
+import { Fetcher } from "openapi-typescript-fetch";
 
-import { loadToken } from './auth';
-import { apiUrl } from './config';
-import { paths } from './types/api';
+import { loadToken } from "./auth";
+import { apiUrl } from "./config";
+import { paths } from "./types/api";
 
 export async function generateFetcher() {
     if (apiUrl.length === 0) {
@@ -15,9 +15,9 @@ export async function generateFetcher() {
         baseUrl: apiUrl,
         init: {
             headers: {
-            Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
             },
         },
-    })
+    });
     return fetcher;
 }

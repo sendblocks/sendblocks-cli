@@ -1,7 +1,7 @@
 {
   "name": "sendblocks-cli",
   "author": "SendBlocks",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A CLI tool for interacting with the SendBlocks platform.",
   "main": "dist/index.js",
   "bin": {

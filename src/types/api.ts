@@ -748,7 +748,7 @@ export interface components {
       storage_address: string;
       /**
        * Follow Proxy
-       * @description Should we search for a variable name in an implementation contract
+       * @description Search for a variable name in an implementation contract
        * @default true
        */
       follow_proxy?: boolean;

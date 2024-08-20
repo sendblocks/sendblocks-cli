@@ -1,14 +1,14 @@
 #! /usr/bin/env node
 
-import { Command } from 'commander';
-import { bin, description, version } from '../package.json';
-import { login } from './auth';
-import { convertHexOrDecimal } from './convert';
-import { deploy } from './deploy';
-import { destroy } from './destroy';
-import * as functions from './functions';
-import { getSetEnvironment, init } from './project';
-import * as webhooks from './webhooks';
+import { Command } from "commander";
+import { bin, description, version } from "../package.json";
+import { login } from "./auth";
+import { convertHexOrDecimal } from "./convert";
+import { deploy } from "./deploy";
+import { destroy } from "./destroy";
+import * as functions from "./functions";
+import { getSetEnvironment, init } from "./project";
+import * as webhooks from "./webhooks";
 
 const program = new Command();
 
@@ -21,10 +21,7 @@ if (cliCommandNames.length !== 1) {
     process.exit(1);
 }
 
-program
-    .name(cliCommandNames[0])
-    .version(version)
-    .description(description);
+program.name(cliCommandNames[0]).version(version).description(description);
 
 program
     .command("env", { hidden: true })
@@ -38,7 +35,6 @@ program
             process.exit(1);
         }
     });
-
 
 program
     .command("login")
@@ -70,7 +66,7 @@ program
     .description("Preview the changes to be deployed.")
     .action(async () => {
         try {
-            await deploy({ previewOnly:true });
+            await deploy({ previewOnly: true });
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);

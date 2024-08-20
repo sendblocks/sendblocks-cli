@@ -15,25 +15,15 @@ function generateWebhooksApi() {
     return __awaiter(this, void 0, void 0, function* () {
         const fetcher = yield (0, fetcher_1.generateFetcher)();
         const api = {
-            createWebhook: fetcher
-                .path("/api/v1/webhooks")
-                .method('post')
-                .create(),
-            listWebhooks: fetcher
-                .path("/api/v1/webhooks")
-                .method('get')
-                .create(),
-            deleteWebhook: fetcher
-                .path("/api/v1/webhooks/{id}")
-                .method('delete')
-                .create(),
+            createWebhook: fetcher.path("/api/v1/webhooks").method("post").create(),
+            listWebhooks: fetcher.path("/api/v1/webhooks").method("get").create(),
+            deleteWebhook: fetcher.path("/api/v1/webhooks/{id}").method("delete").create(),
         };
         return api;
     });
 }
 function isWebhookChanged(name, sendblocksWebhook, specWebhook) {
-    return (sendblocksWebhook.url !== specWebhook.url ||
-        sendblocksWebhook.secret !== specWebhook.secret);
+    return sendblocksWebhook.url !== specWebhook.url || sendblocksWebhook.secret !== specWebhook.secret;
 }
 exports.isWebhookChanged = isWebhookChanged;
 function listWebhooks() {
@@ -50,7 +40,6 @@ function listWebhooks() {
     });
 }
 exports.listWebhooks = listWebhooks;
-;
 function getWebhookDictionary() {
     return __awaiter(this, void 0, void 0, function* () {
         const returnObject = {};
@@ -100,7 +89,7 @@ function deploy(stateChanges) {
                         deployed: true,
                         webhook_name: addedWebhook.webhook_name,
                         webhook_id: response.data.webhook_id,
-                        url: addedWebhook.url
+                        url: addedWebhook.url,
                     });
                 }
                 else {

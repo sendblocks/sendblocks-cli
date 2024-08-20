@@ -1,6 +1,4 @@
-import {
-    components
-} from "./types/api";
+import { components } from "./types/api";
 
 const VALID_LOCATIONS: string[] = [
     "trace_to",
@@ -26,7 +24,7 @@ const VALID_TRIGGERS = [
 
 function isAddressTriggerTypeChanged(
     sendblocksFunctionTrigger: components["schemas"]["AddressTriggerData"],
-    specFunctionTrigger: components["schemas"]["AddressTriggerData"]
+    specFunctionTrigger: components["schemas"]["AddressTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.address.toLowerCase() != specFunctionTrigger.address.toLowerCase()) {
         return true;
@@ -48,7 +46,7 @@ function isAddressTriggerTypeChanged(
 
 function isEventTriggerTypeChanged(
     sendblocksFunctionTrigger: components["schemas"]["EventTriggerData"],
-    specFunctionTrigger: components["schemas"]["EventTriggerData"]
+    specFunctionTrigger: components["schemas"]["EventTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.event != specFunctionTrigger.event) {
         return true;
@@ -58,7 +56,7 @@ function isEventTriggerTypeChanged(
 
 function isFunctionTriggerTypeChanged(
     sendblocksFunctionTrigger: components["schemas"]["FunctionTriggerData"],
-    specFunctionTrigger: components["schemas"]["FunctionTriggerData"]
+    specFunctionTrigger: components["schemas"]["FunctionTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.function != specFunctionTrigger.function) {
         return true;
@@ -68,7 +66,7 @@ function isFunctionTriggerTypeChanged(
 
 function isStorageAccessTriggerVariableChanged(
     sendblocksFunctionTriggerVariable: any,
-    specFunctionTriggerVariable: any
+    specFunctionTriggerVariable: any,
 ): boolean {
     if (sendblocksFunctionTriggerVariable.variable_name != specFunctionTriggerVariable.variable_name) {
         return true;
@@ -81,7 +79,7 @@ function isStorageAccessTriggerVariableChanged(
 
 function isStorageAccessTriggerTypeChanged(
     sendblocksFunctionTrigger: components["schemas"]["StorageTriggerData"],
-    specFunctionTrigger: components["schemas"]["StorageTriggerData"]
+    specFunctionTrigger: components["schemas"]["StorageTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.storage_address.toLowerCase() != specFunctionTrigger.storage_address.toLowerCase()) {
         return true;
@@ -96,8 +94,22 @@ function isStorageAccessTriggerTypeChanged(
 }
 
 export function areFunctionTriggersChanged(
-    sendblocksFunctionTriggers: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"])[],
-    specFunctionTriggers: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"])[]
+    sendblocksFunctionTriggers: (
+        | components["schemas"]["AddressTriggerData"]
+        | components["schemas"]["EventTriggerData"]
+        | components["schemas"]["FunctionTriggerData"]
+        | components["schemas"]["NewBlockTriggerData"]
+        | components["schemas"]["NewContractTriggerData"]
+        | components["schemas"]["StorageTriggerData"]
+    )[],
+    specFunctionTriggers: (
+        | components["schemas"]["AddressTriggerData"]
+        | components["schemas"]["EventTriggerData"]
+        | components["schemas"]["FunctionTriggerData"]
+        | components["schemas"]["NewBlockTriggerData"]
+        | components["schemas"]["NewContractTriggerData"]
+        | components["schemas"]["StorageTriggerData"]
+    )[],
 ): boolean {
     if (sendblocksFunctionTriggers.length != specFunctionTriggers.length) {
         return true;
@@ -127,8 +139,20 @@ export function areFunctionTriggersChanged(
 }
 
 export function isFunctionTriggerChanged(
-    sendblocksFunctionTrigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"],
-    specFunctionTrigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"]
+    sendblocksFunctionTrigger:
+        | components["schemas"]["AddressTriggerData"]
+        | components["schemas"]["EventTriggerData"]
+        | components["schemas"]["FunctionTriggerData"]
+        | components["schemas"]["NewBlockTriggerData"]
+        | components["schemas"]["NewContractTriggerData"]
+        | components["schemas"]["StorageTriggerData"],
+    specFunctionTrigger:
+        | components["schemas"]["AddressTriggerData"]
+        | components["schemas"]["EventTriggerData"]
+        | components["schemas"]["FunctionTriggerData"]
+        | components["schemas"]["NewBlockTriggerData"]
+        | components["schemas"]["NewContractTriggerData"]
+        | components["schemas"]["StorageTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.type != specFunctionTrigger.type) {
         return true;
@@ -221,7 +245,14 @@ function validateStorageAccessTriggerType(trigger: components["schemas"]["Storag
 }
 
 export function validateFunctionTrigger(
-    trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"]) {
+    trigger:
+        | components["schemas"]["AddressTriggerData"]
+        | components["schemas"]["EventTriggerData"]
+        | components["schemas"]["FunctionTriggerData"]
+        | components["schemas"]["NewBlockTriggerData"]
+        | components["schemas"]["NewContractTriggerData"]
+        | components["schemas"]["StorageTriggerData"],
+) {
     if (!trigger) {
         throw new Error("Trigger is required.");
     }

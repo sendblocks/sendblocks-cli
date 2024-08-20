@@ -51,10 +51,7 @@ if (cliCommandNames.length !== 1) {
     console.error("Exactly one binary name must be defined in package.json!");
     process.exit(1);
 }
-program
-    .name(cliCommandNames[0])
-    .version(package_json_1.version)
-    .description(package_json_1.description);
+program.name(cliCommandNames[0]).version(package_json_1.version).description(package_json_1.description);
 program
     .command("env", { hidden: true })
     .description("Get or set the current environment variables.")

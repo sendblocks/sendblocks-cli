@@ -1,17 +1,17 @@
-import fs from 'fs';
+import fs from "fs";
 
-import prompts from 'prompts';
-import { authUrl, ensureSendBlocksConfigured } from './config';
+import prompts from "prompts";
+import { authUrl, ensureSendBlocksConfigured } from "./config";
 
 export async function loadToken() {
     // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
     //        see https://app.clickup.com/t/86945t08u
     try {
-        const token = fs.readFileSync('.auth', 'utf-8');
+        const token = fs.readFileSync(".auth", "utf-8");
         if (token.length > 0) {
             return token;
         }
-        throw new Error('Failed to load token from .auth file.');
+        throw new Error("Failed to load token from .auth file.");
     } catch (error) {
         console.error(`${error} Please login first:`);
         return await login();
@@ -27,37 +27,37 @@ export async function login(): Promise<string> {
     }
 
     const clientId = await prompts({
-        type: 'text',
-        name: 'value',
-        message: 'Enter your SendBlocks Client ID',
+        type: "text",
+        name: "value",
+        message: "Enter your SendBlocks Client ID",
     });
 
     if (!clientId.value || clientId.value.length === 0) {
-        throw new Error('Client ID is required.');
+        throw new Error("Client ID is required.");
     }
 
     const secret = await prompts({
-        type: 'password',
-        name: 'value',
-        message: 'Enter your SendBlocks Secret',
+        type: "password",
+        name: "value",
+        message: "Enter your SendBlocks Secret",
     });
 
     if (!secret.value || secret.value.length === 0) {
-        throw new Error('Secret is required.');
+        throw new Error("Secret is required.");
     }
 
     // delete the .auth file
     try {
-        fs.unlinkSync('.auth');
+        fs.unlinkSync(".auth");
     } catch (error) {
         // ignore error
     }
 
     let token: string;
     const response = await fetch(authUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
             clientId: clientId.value,
@@ -69,8 +69,8 @@ export async function login(): Promise<string> {
     }
     const data = await response.json();
     token = data.accessToken;
-    await fs.promises.writeFile('.auth', token);
-    console.log('Successfully logged in! Bearer token stored in .auth file.');
+    await fs.promises.writeFile(".auth", token);
+    console.log("Successfully logged in! Bearer token stored in .auth file.");
     console.log(`Bearer token: ${token}\n\n`);
     return token;
-};
+}

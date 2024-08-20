@@ -21,11 +21,11 @@ function loadToken() {
         // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
         //        see https://app.clickup.com/t/86945t08u
         try {
-            const token = fs_1.default.readFileSync('.auth', 'utf-8');
+            const token = fs_1.default.readFileSync(".auth", "utf-8");
             if (token.length > 0) {
                 return token;
             }
-            throw new Error('Failed to load token from .auth file.');
+            throw new Error("Failed to load token from .auth file.");
         }
         catch (error) {
             console.error(`${error} Please login first:`);
@@ -42,33 +42,33 @@ function login() {
             process.exit(1);
         }
         const clientId = yield (0, prompts_1.default)({
-            type: 'text',
-            name: 'value',
-            message: 'Enter your SendBlocks Client ID',
+            type: "text",
+            name: "value",
+            message: "Enter your SendBlocks Client ID",
         });
         if (!clientId.value || clientId.value.length === 0) {
-            throw new Error('Client ID is required.');
+            throw new Error("Client ID is required.");
         }
         const secret = yield (0, prompts_1.default)({
-            type: 'password',
-            name: 'value',
-            message: 'Enter your SendBlocks Secret',
+            type: "password",
+            name: "value",
+            message: "Enter your SendBlocks Secret",
         });
         if (!secret.value || secret.value.length === 0) {
-            throw new Error('Secret is required.');
+            throw new Error("Secret is required.");
         }
         // delete the .auth file
         try {
-            fs_1.default.unlinkSync('.auth');
+            fs_1.default.unlinkSync(".auth");
         }
         catch (error) {
             // ignore error
         }
         let token;
         const response = yield fetch(config_1.authUrl, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 clientId: clientId.value,
@@ -80,12 +80,11 @@ function login() {
         }
         const data = yield response.json();
         token = data.accessToken;
-        yield fs_1.default.promises.writeFile('.auth', token);
-        console.log('Successfully logged in! Bearer token stored in .auth file.');
+        yield fs_1.default.promises.writeFile(".auth", token);
+        console.log("Successfully logged in! Bearer token stored in .auth file.");
         console.log(`Bearer token: ${token}\n\n`);
         return token;
     });
 }
 exports.login = login;
-;
 //# sourceMappingURL=auth.js.map

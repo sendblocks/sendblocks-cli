@@ -42,20 +42,10 @@ const functionTriggers = __importStar(require("./function-triggers"));
 const functions = __importStar(require("./functions"));
 const webhooks = __importStar(require("./webhooks"));
 function findWebhookById(webhookId, webhooks) {
-    return [
-        ...webhooks.added,
-        ...webhooks.changed,
-        ...webhooks.unchanged,
-        ...webhooks.unreferenced
-    ].find((webhook) => webhook.webhook_id === webhookId);
+    return [...webhooks.added, ...webhooks.changed, ...webhooks.unchanged, ...webhooks.unreferenced].find((webhook) => webhook.webhook_id === webhookId);
 }
 function findWebhookByName(webhookName, webhooks) {
-    return [
-        ...webhooks.added,
-        ...webhooks.changed,
-        ...webhooks.unchanged,
-        ...webhooks.unreferenced
-    ].find((webhook) => webhook.webhook_name === webhookName);
+    return [...webhooks.added, ...webhooks.changed, ...webhooks.unchanged, ...webhooks.unreferenced].find((webhook) => webhook.webhook_name === webhookName);
 }
 function newResourceStateChanges() {
     return {
@@ -72,7 +62,7 @@ function generateStateChanges(spec) {
     return __awaiter(this, void 0, void 0, function* () {
         // compare the state of the functions and webhooks in the yaml files with the
         // state of the functions and webhooks in the SendBlocks, then print the differences
-        console.log('Comparing state...');
+        console.log("Comparing state...");
         const result = {
             webhooks: newResourceStateChanges(),
             functions: newResourceStateChanges(),
@@ -105,7 +95,11 @@ function generateStateChanges(spec) {
                             changes: [
                                 sendblocksWebhook.url !== specWebhook.url ? `url (currently ${sendblocksWebhook.url})` : "",
                                 sendblocksWebhook.secret !== specWebhook.secret ? "secret" : "",
-                            ].filter((change) => { return change.length > 0; }).join(', '),
+                            ]
+                                .filter((change) => {
+                                return change.length > 0;
+                            })
+                                .join(", "),
                             secretChanged: specWebhook.secret !== sendblocksWebhook.secret,
                             secret: specWebhook.secret,
                             webhook_id: sendblocksWebhook.webhook_id,
@@ -166,7 +160,7 @@ function generateStateChanges(spec) {
                         throw new Error(`Function ${specItem} has an invalid trigger: ${error.message}`);
                     }
                 }
-                result.functions.added.push(Object.assign(Object.assign({ function_name: specItem }, specFunction), { trigger_types: specFunction.triggers.map((trigger) => trigger.type).join(', '), should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams) }));
+                result.functions.added.push(Object.assign(Object.assign({ function_name: specItem }, specFunction), { trigger_types: specFunction.triggers.map((trigger) => trigger.type).join(", "), should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams) }));
             }
             else {
                 // get the existing function code from sendblocks
@@ -174,13 +168,22 @@ function generateStateChanges(spec) {
                 if (functions.isFunctionChanged(specItem, sendblocksFunction, specFunction)) {
                     result.functions.changed.push(Object.assign(Object.assign({ function_name: specItem }, specFunction), { function_id: sendblocksFunction.function_id, changes: [
                             sendblocksFunction.code !== specFunction.code ? "code" : "",
-                            functionTriggers.areFunctionTriggersChanged(sendblocksFunction.triggers, specFunction.triggers) ? "triggers" : "",
+                            functionTriggers.areFunctionTriggersChanged(sendblocksFunction.triggers, specFunction.triggers)
+                                ? "triggers"
+                                : "",
                             sendblocksFunction.webhook_id !== specFunction.webhook_id ? "webhook" : "",
-                            sendblocksFunction.should_send_std_streams !== should_send_std_streams(specFunction.should_send_std_streams) ? "should_send_std_streams" : "",
-                        ].filter((change) => { return change.length > 0; }).join(', '), should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams) }));
+                            sendblocksFunction.should_send_std_streams !==
+                                should_send_std_streams(specFunction.should_send_std_streams)
+                                ? "should_send_std_streams"
+                                : "",
+                        ]
+                            .filter((change) => {
+                            return change.length > 0;
+                        })
+                            .join(", "), should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams) }));
                 }
                 else {
-                    result.functions.unchanged.push(Object.assign(Object.assign({ function_name: specItem }, specFunction), { trigger_types: specFunction.triggers.map((trigger) => trigger.type).join(', '), should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams), function_id: sendblocksFunction.function_id }));
+                    result.functions.unchanged.push(Object.assign(Object.assign({ function_name: specItem }, specFunction), { trigger_types: specFunction.triggers.map((trigger) => trigger.type).join(", "), should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams), function_id: sendblocksFunction.function_id }));
                 }
             }
         }
@@ -192,7 +195,7 @@ function generateStateChanges(spec) {
             }
             sendblocksFunction.webhook = webhook.webhook_name;
             if (!Object.keys(spec.functions).includes(function_name)) {
-                result.functions.unreferenced.push(Object.assign(Object.assign({ function_name: sendblocksFunction.function_name, function_id: sendblocksFunction.function_id }, sendblocksFunction), { trigger_types: sendblocksFunction.triggers.map((trigger) => trigger.type).join(', '), should_send_std_streams: should_send_std_streams(sendblocksFunction.should_send_std_streams) }));
+                result.functions.unreferenced.push(Object.assign(Object.assign({ function_name: sendblocksFunction.function_name, function_id: sendblocksFunction.function_id }, sendblocksFunction), { trigger_types: sendblocksFunction.triggers.map((trigger) => trigger.type).join(", "), should_send_std_streams: should_send_std_streams(sendblocksFunction.should_send_std_streams) }));
             }
         }
         return result;

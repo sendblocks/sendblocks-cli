@@ -1,17 +1,18 @@
-import fs from 'fs';
-import { parse } from 'yaml';
+import fs from "fs";
+import { parse } from "yaml";
 
-import { YAML_SOURCE_FOLDER } from './project';
+import { YAML_SOURCE_FOLDER } from "./project";
 
 export type Spec = Record<string, any>;
 
 export function listYamlFiles(): string[] {
     // get the list of yaml files in the yaml src folder
-    const yamlFiles = fs.readdirSync(YAML_SOURCE_FOLDER)
-                        .filter(file => (file.endsWith('.yaml') || file.endsWith('.yml')));
+    const yamlFiles = fs
+        .readdirSync(YAML_SOURCE_FOLDER)
+        .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
     console.log(`Found ${yamlFiles.length} yaml files in ${YAML_SOURCE_FOLDER} folder`);
     if (yamlFiles.length > 0) {
-        console.log(" -", yamlFiles.join('\n - '));
+        console.log(" -", yamlFiles.join("\n - "));
     }
 
     return yamlFiles;
@@ -24,7 +25,7 @@ export async function mergeYamlFiles(yamlFiles: string[]): Promise<Spec> {
     };
     for (const file of yamlFiles) {
         const yamlPath = `${YAML_SOURCE_FOLDER}/${file}`;
-        const yamlContent = fs.readFileSync(yamlPath, 'utf-8');
+        const yamlContent = fs.readFileSync(yamlPath, "utf-8");
         const yaml = parse(yamlContent);
 
         for (const key of Object.keys(yaml)) {

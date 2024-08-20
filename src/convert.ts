@@ -1,10 +1,10 @@
 export const convertDecimalToHex = (decimal: number) => {
     return `0x${decimal.toString(16)}`;
-}
+};
 
 export const convertHexToDecimal = (hex: string) => {
     return parseInt(hex, 16);
-}
+};
 
 export const convertHexOrDecimal = (value: string) => {
     if (value.startsWith("0x") || /[a-fA-F]+/.test(value)) {
@@ -20,4 +20,4 @@ export const convertHexOrDecimal = (value: string) => {
         }
         return convertDecimalToHex(parseInt(value));
     }
-}
+};

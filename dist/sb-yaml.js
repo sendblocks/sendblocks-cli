@@ -18,11 +18,12 @@ const yaml_1 = require("yaml");
 const project_1 = require("./project");
 function listYamlFiles() {
     // get the list of yaml files in the yaml src folder
-    const yamlFiles = fs_1.default.readdirSync(project_1.YAML_SOURCE_FOLDER)
-        .filter(file => (file.endsWith('.yaml') || file.endsWith('.yml')));
+    const yamlFiles = fs_1.default
+        .readdirSync(project_1.YAML_SOURCE_FOLDER)
+        .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
     console.log(`Found ${yamlFiles.length} yaml files in ${project_1.YAML_SOURCE_FOLDER} folder`);
     if (yamlFiles.length > 0) {
-        console.log(" -", yamlFiles.join('\n - '));
+        console.log(" -", yamlFiles.join("\n - "));
     }
     return yamlFiles;
 }
@@ -35,7 +36,7 @@ function mergeYamlFiles(yamlFiles) {
         };
         for (const file of yamlFiles) {
             const yamlPath = `${project_1.YAML_SOURCE_FOLDER}/${file}`;
-            const yamlContent = fs_1.default.readFileSync(yamlPath, 'utf-8');
+            const yamlContent = fs_1.default.readFileSync(yamlPath, "utf-8");
             const yaml = (0, yaml_1.parse)(yamlContent);
             for (const key of Object.keys(yaml)) {
                 if (!Object.keys(spec).includes(key)) {

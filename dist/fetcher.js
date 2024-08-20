@@ -25,7 +25,7 @@ function generateFetcher() {
             baseUrl: config_1.apiUrl,
             init: {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
             },
         });

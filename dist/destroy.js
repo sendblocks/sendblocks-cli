@@ -49,58 +49,66 @@ function destroy() {
         const stateChanges = yield (0, state_diff_1.generateStateChanges)(spec);
         printStateChanges(stateChanges);
         if (dryRun) {
-            console.log('Dry-run complete! No resources were destroyed.');
+            console.log("Dry-run complete! No resources were destroyed.");
             return;
         }
-        if (stateChanges.webhooks.changed.length === 0 && stateChanges.webhooks.unchanged.length === 0 &&
-            stateChanges.functions.changed.length === 0 && stateChanges.functions.unchanged.length === 0) {
-            console.log('No resources to destroy');
+        if (stateChanges.webhooks.changed.length === 0 &&
+            stateChanges.webhooks.unchanged.length === 0 &&
+            stateChanges.functions.changed.length === 0 &&
+            stateChanges.functions.unchanged.length === 0) {
+            console.log("No resources to destroy");
             return;
         }
         let confirm;
         if (!nonInteractive) {
             // confirm changes with the user
             confirm = yield (0, prompts_1.default)({
-                type: 'confirm',
-                name: 'value',
-                message: 'Please confirm that you have reviewed the changes and want to proceed with destroying the resources',
+                type: "confirm",
+                name: "value",
+                message: "Please confirm that you have reviewed the changes and want to proceed with destroying the resources",
             });
         }
         if (nonInteractive || (confirm === null || confirm === void 0 ? void 0 : confirm.value)) {
             // deploy the changes
-            console.log('Deploying changes...\n');
+            console.log("Deploying changes...\n");
             const functionResults = yield functions.destroy(stateChanges.functions);
             const webhookResults = yield webhooks.destroy(stateChanges.webhooks, functionResults);
-            console.log('\nDeployment complete!');
-            console.log('Function deployment results:');
-            console.table(functionResults, ['function_name', 'destroyed', 'skipped', 'response']);
-            console.log('\nWebhook deployment results:');
-            console.table(webhookResults, ['webhook_name', 'destroyed', 'skipped', 'response']);
+            console.log("\nDeployment complete!");
+            console.log("Function deployment results:");
+            console.table(functionResults, ["function_name", "destroyed", "skipped", "response"]);
+            console.log("\nWebhook deployment results:");
+            console.table(webhookResults, ["webhook_name", "destroyed", "skipped", "response"]);
         }
     });
 }
 exports.destroy = destroy;
 function printStateChanges(stateChanges) {
     // print a table showing the differences between the states
-    console.log('Webhooks:');
+    console.log("Webhooks:");
     const combinedWebhookChanges = [...stateChanges.webhooks.changed, ...stateChanges.webhooks.unchanged];
     if (combinedWebhookChanges.length > 0) {
-        console.log(' - To be destroyed:');
-        console.table(combinedWebhookChanges, ['webhook_name', 'url', 'webhook_id']);
+        console.log(" - To be destroyed:");
+        console.table(combinedWebhookChanges, ["webhook_name", "url", "webhook_id"]);
     }
     if (stateChanges.webhooks.unreferenced.length > 0) {
-        console.log(' - Unreferenced:');
-        console.table(stateChanges.webhooks.unreferenced, ['webhook_name', 'url', 'webhook_id']);
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.webhooks.unreferenced, ["webhook_name", "url", "webhook_id"]);
     }
-    console.log('Functions:');
+    console.log("Functions:");
     const combinedFunctionChanges = [...stateChanges.functions.changed, ...stateChanges.functions.unchanged];
     if (combinedFunctionChanges.length > 0) {
-        console.log(' - To be destroyed:');
-        console.table(combinedFunctionChanges, ['function_name', 'function_id', 'chain_id', 'webhook']);
+        console.log(" - To be destroyed:");
+        console.table(combinedFunctionChanges, ["function_name", "function_id", "chain_id", "webhook"]);
     }
     if (stateChanges.functions.unreferenced.length > 0) {
-        console.log(' - Unreferenced:');
-        console.table(stateChanges.functions.unreferenced, ['function_name', 'function_id', 'chain_id', 'trigger_types', 'webhook']);
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.functions.unreferenced, [
+            "function_name",
+            "function_id",
+            "chain_id",
+            "trigger_types",
+            "webhook",
+        ]);
     }
 }
 //# sourceMappingURL=destroy.js.map

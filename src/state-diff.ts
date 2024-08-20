@@ -1,32 +1,26 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-import * as functionTriggers from './function-triggers';
-import * as functions from './functions';
-import { Spec } from './sb-yaml';
-import * as webhooks from './webhooks';
+import * as functionTriggers from "./function-triggers";
+import * as functions from "./functions";
+import { Spec } from "./sb-yaml";
+import * as webhooks from "./webhooks";
 
 type StateComparisonResult = {
-    webhooks: ResourceStateChanges,
-    functions: ResourceStateChanges,
+    webhooks: ResourceStateChanges;
+    functions: ResourceStateChanges;
 };
 
 function findWebhookById(webhookId: string, webhooks: ResourceStateChanges) {
-    return [
-        ...webhooks.added,
-        ...webhooks.changed,
-        ...webhooks.unchanged,
-        ...webhooks.unreferenced
-    ].find((webhook: any) => webhook.webhook_id === webhookId);
+    return [...webhooks.added, ...webhooks.changed, ...webhooks.unchanged, ...webhooks.unreferenced].find(
+        (webhook: any) => webhook.webhook_id === webhookId,
+    );
 }
 
 function findWebhookByName(webhookName: string, webhooks: ResourceStateChanges) {
-    return [
-        ...webhooks.added,
-        ...webhooks.changed,
-        ...webhooks.unchanged,
-        ...webhooks.unreferenced
-    ].find((webhook: any) => webhook.webhook_name === webhookName);
+    return [...webhooks.added, ...webhooks.changed, ...webhooks.unchanged, ...webhooks.unreferenced].find(
+        (webhook: any) => webhook.webhook_name === webhookName,
+    );
 }
 
 function newResourceStateChanges() {
@@ -39,13 +33,13 @@ function newResourceStateChanges() {
 }
 
 function should_send_std_streams(should_send_std_streams: any) {
-    return should_send_std_streams === false ? false : true
+    return should_send_std_streams === false ? false : true;
 }
 
 export async function generateStateChanges(spec: Spec) {
     // compare the state of the functions and webhooks in the yaml files with the
     // state of the functions and webhooks in the SendBlocks, then print the differences
-    console.log('Comparing state...');
+    console.log("Comparing state...");
 
     const result: StateComparisonResult = {
         webhooks: newResourceStateChanges(),
@@ -82,7 +76,11 @@ export async function generateStateChanges(spec: Spec) {
                         changes: [
                             sendblocksWebhook.url !== specWebhook.url ? `url (currently ${sendblocksWebhook.url})` : "",
                             sendblocksWebhook.secret !== specWebhook.secret ? "secret" : "",
-                        ].filter((change) => { return change.length > 0;}).join(', '),
+                        ]
+                            .filter((change) => {
+                                return change.length > 0;
+                            })
+                            .join(", "),
                         secretChanged: specWebhook.secret !== sendblocksWebhook.secret,
                         secret: specWebhook.secret,
                         webhook_id: sendblocksWebhook.webhook_id,
@@ -148,7 +146,7 @@ export async function generateStateChanges(spec: Spec) {
             result.functions.added.push({
                 function_name: specItem,
                 ...specFunction,
-                trigger_types: specFunction.triggers.map((trigger: any) => trigger.type).join(', '),
+                trigger_types: specFunction.triggers.map((trigger: any) => trigger.type).join(", "),
                 should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams),
             });
         } else {
@@ -161,17 +159,26 @@ export async function generateStateChanges(spec: Spec) {
                     function_id: sendblocksFunction.function_id,
                     changes: [
                         sendblocksFunction.code !== specFunction.code ? "code" : "",
-                        functionTriggers.areFunctionTriggersChanged(sendblocksFunction.triggers, specFunction.triggers) ? "triggers" : "",
+                        functionTriggers.areFunctionTriggersChanged(sendblocksFunction.triggers, specFunction.triggers)
+                            ? "triggers"
+                            : "",
                         sendblocksFunction.webhook_id !== specFunction.webhook_id ? "webhook" : "",
-                        sendblocksFunction.should_send_std_streams !== should_send_std_streams(specFunction.should_send_std_streams) ? "should_send_std_streams" : "",
-                    ].filter((change) => { return change.length > 0;}).join(', '),
+                        sendblocksFunction.should_send_std_streams !==
+                        should_send_std_streams(specFunction.should_send_std_streams)
+                            ? "should_send_std_streams"
+                            : "",
+                    ]
+                        .filter((change) => {
+                            return change.length > 0;
+                        })
+                        .join(", "),
                     should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams),
                 });
             } else {
                 result.functions.unchanged.push({
                     function_name: specItem,
                     ...specFunction,
-                    trigger_types: specFunction.triggers.map((trigger: any) => trigger.type).join(', '),
+                    trigger_types: specFunction.triggers.map((trigger: any) => trigger.type).join(", "),
                     should_send_std_streams: should_send_std_streams(specFunction.should_send_std_streams),
                     function_id: sendblocksFunction.function_id,
                 });
@@ -182,7 +189,9 @@ export async function generateStateChanges(spec: Spec) {
         const sendblocksFunction = sendblocksFunctions[function_name];
         const webhook = findWebhookById(sendblocksFunction.webhook_id, result.webhooks);
         if (!webhook) {
-            throw new Error(`Function ${function_name} references a webhook that does not exist: ${sendblocksFunction.webhook_id}`);
+            throw new Error(
+                `Function ${function_name} references a webhook that does not exist: ${sendblocksFunction.webhook_id}`,
+            );
         }
         sendblocksFunction.webhook = webhook.webhook_name;
         if (!Object.keys(spec.functions).includes(function_name)) {
@@ -190,7 +199,7 @@ export async function generateStateChanges(spec: Spec) {
                 function_name: sendblocksFunction.function_name,
                 function_id: sendblocksFunction.function_id,
                 ...sendblocksFunction,
-                trigger_types: sendblocksFunction.triggers.map((trigger: any) => trigger.type).join(', '),
+                trigger_types: sendblocksFunction.triggers.map((trigger: any) => trigger.type).join(", "),
                 should_send_std_streams: should_send_std_streams(sendblocksFunction.should_send_std_streams),
             });
         }

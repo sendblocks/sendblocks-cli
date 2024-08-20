@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import prompts from 'prompts';
-import { ensureSendBlocksConfigured } from './config';
+import fs from "fs";
+import path from "path";
+import prompts from "prompts";
+import { ensureSendBlocksConfigured } from "./config";
 
 export const FUNCTION_CODE_FOLDER = "functions";
 export const YAML_SOURCE_FOLDER = "src";
@@ -14,7 +14,7 @@ type InitOptions = {
 
 export async function getSetEnvironment(
     env: string,
-    options: { projectPath?: string, quiet?: boolean } = {}
+    options: { projectPath?: string; quiet?: boolean } = {},
 ): Promise<void> {
     const projectPath: string = options.projectPath || path.resolve(process.cwd());
     ensureSendBlocksConfigured({ projectPath });
@@ -25,9 +25,10 @@ export async function getSetEnvironment(
                 console.log("Setting configuration for", env);
             }
             // copy the config file for the target environment
-            const sourcePath = env == "default" ?
-                path.resolve(__dirname, `../${CONFIG_FILE}`) :
-                path.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
+            const sourcePath =
+                env == "default"
+                    ? path.resolve(__dirname, `../${CONFIG_FILE}`)
+                    : path.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
             const targetPath = path.resolve(projectPath, CONFIG_FILE);
             fs.copyFileSync(sourcePath, targetPath);
         } catch (error) {
@@ -46,8 +47,7 @@ export async function getSetEnvironment(
             console.log("No environment set.");
         }
     }
-
-};
+}
 
 export async function init(options: InitOptions = {}) {
     const projectPath: string = path.resolve(options.path || process.cwd());
@@ -71,7 +71,9 @@ export async function init(options: InitOptions = {}) {
         }
 
         if (filesToBeOverwritten.length > 0) {
-            console.warn(`\nWARNING: The following files will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`);
+            console.warn(
+                `\nWARNING: The following files will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`,
+            );
             const confirm = await prompts({
                 type: "confirm",
                 name: "value",

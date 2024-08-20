@@ -11,7 +11,7 @@ function ensureSendBlocksConfigured(options = {}) {
     const projectPath = options.projectPath || path_1.default.resolve(process.cwd());
     const sendblocksFile = path_1.default.resolve(projectPath, CONFIG_FILE);
     if (!fs_1.default.existsSync(sendblocksFile)) {
-        console.error('Please initialize the project before logging in.');
+        console.error("Please initialize the project before logging in.");
         process.exit(1);
     }
 }
@@ -21,7 +21,7 @@ let configurationJson = {
     apiUrl: "",
 };
 try {
-    configurationJson = JSON.parse(fs_1.default.readFileSync(CONFIG_FILE, 'utf-8'));
+    configurationJson = JSON.parse(fs_1.default.readFileSync(CONFIG_FILE, "utf-8"));
 }
 catch (error) {
     // ignore this error here, we'll handle it where necessary

@@ -5,28 +5,16 @@ async function generateWebhooksApi() {
     const fetcher = await generateFetcher();
 
     const api = {
-        createWebhook: fetcher
-            .path("/api/v1/webhooks")
-            .method('post')
-            .create(),
-        listWebhooks: fetcher
-            .path("/api/v1/webhooks")
-            .method('get')
-            .create(),
-        deleteWebhook: fetcher
-            .path("/api/v1/webhooks/{id}")
-            .method('delete')
-            .create(),
+        createWebhook: fetcher.path("/api/v1/webhooks").method("post").create(),
+        listWebhooks: fetcher.path("/api/v1/webhooks").method("get").create(),
+        deleteWebhook: fetcher.path("/api/v1/webhooks/{id}").method("delete").create(),
     };
 
     return api;
 }
 
 export function isWebhookChanged(name: string, sendblocksWebhook: any, specWebhook: any) {
-    return (
-        sendblocksWebhook.url !== specWebhook.url ||
-        sendblocksWebhook.secret !== specWebhook.secret
-    );
+    return sendblocksWebhook.url !== specWebhook.url || sendblocksWebhook.secret !== specWebhook.secret;
 }
 
 export async function listWebhooks() {
@@ -35,11 +23,11 @@ export async function listWebhooks() {
     let page = 1;
     let response: ApiResponse;
     do {
-        response = await api.listWebhooks({page: page++});
+        response = await api.listWebhooks({ page: page++ });
         webhooks.push(...response.data.items);
     } while (response.data.page < response.data.pages);
     return webhooks;
-};
+}
 
 export async function getWebhookDictionary() {
     const returnObject: { [name: string]: any } = {};
@@ -61,7 +49,7 @@ export async function deleteWebhook(webhookName: string) {
     }
     const webhookId = sendblocksWebhook.webhook_id;
     try {
-        const response = await api.deleteWebhook({id: webhookId});
+        const response = await api.deleteWebhook({ id: webhookId });
         return response;
     } catch (error) {
         throw new Error(`Error occurred while deleting webhook ${webhookName} (${webhookId}): ${error}`);
@@ -84,7 +72,7 @@ export async function deploy(stateChanges: ResourceStateChanges) {
                     deployed: true,
                     webhook_name: addedWebhook.webhook_name,
                     webhook_id: response.data.webhook_id,
-                    url: addedWebhook.url
+                    url: addedWebhook.url,
                 });
             } else {
                 throw new Error(`${response.status} ${response.statusText}`);
@@ -128,7 +116,7 @@ export async function destroy(stateChanges: ResourceStateChanges, functionDeploy
     for (const webhookToDelete of webhooksToDelete) {
         console.log(`Deleting webhook ${webhookToDelete.webhook_name}...`);
         try {
-            const response = await api.deleteWebhook({id: webhookToDelete.webhook_id});
+            const response = await api.deleteWebhook({ id: webhookToDelete.webhook_id });
             if (response.ok) {
                 results.push({
                     webhook_name: webhookToDelete.webhook_name,

@@ -1,4 +1,4 @@
 {
-    "authUrl": "https://auth-sendblocks.frontegg.com/identity/resources/auth/v1/api-token",
+    "authUrl": "https://auth.sendblocks.io/identity/resources/auth/v1/api-token",
     "apiUrl": "https://api.sendblocks.io"
 }

@@ -30,9 +30,9 @@ function getSetEnvironment(env_1) {
                     console.log("Setting configuration for", env);
                 }
                 // copy the config file for the target environment
-                const sourcePath = env == "default" ?
-                    path_1.default.resolve(__dirname, `../${CONFIG_FILE}`) :
-                    path_1.default.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
+                const sourcePath = env == "default"
+                    ? path_1.default.resolve(__dirname, `../${CONFIG_FILE}`)
+                    : path_1.default.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
                 const targetPath = path_1.default.resolve(projectPath, CONFIG_FILE);
                 fs_1.default.copyFileSync(sourcePath, targetPath);
             }
@@ -57,7 +57,6 @@ function getSetEnvironment(env_1) {
     });
 }
 exports.getSetEnvironment = getSetEnvironment;
-;
 function init() {
     return __awaiter(this, arguments, void 0, function* (options = {}) {
         const projectPath = path_1.default.resolve(options.path || process.cwd());
