@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = exports.getSetEnvironment = exports.YAML_SOURCE_FOLDER = exports.FUNCTION_CODE_FOLDER = void 0;
+exports.init = exports.getSetEnvironment = exports.YAML_SOURCE_FOLDER = exports.TARGET_YAML_FILE = exports.SAMPLES_CODE_FOLDER = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const prompts_1 = __importDefault(require("prompts"));
 const config_1 = require("./config");
-exports.FUNCTION_CODE_FOLDER = "functions";
+exports.SAMPLES_CODE_FOLDER = "samples";
+exports.TARGET_YAML_FILE = "samples.yaml";
 exports.YAML_SOURCE_FOLDER = "src";
 const CONFIG_FILE = "sendblocks.config.json";
 function getSetEnvironment(env_1) {
@@ -62,11 +63,11 @@ function init() {
         const projectPath = path_1.default.resolve(options.path || process.cwd());
         console.log(`Initializing project at ${projectPath} ...`);
         const targetEnvPath = path_1.default.resolve(projectPath, CONFIG_FILE);
-        const targetFunctionPath = path_1.default.resolve(projectPath, exports.FUNCTION_CODE_FOLDER, "echo_function.ts");
+        const targetSamplesPath = path_1.default.resolve(projectPath, exports.SAMPLES_CODE_FOLDER);
         const targetGitignorePath = path_1.default.resolve(projectPath, ".gitignore");
         const targetReadmePath = path_1.default.resolve(projectPath, "README.md");
-        const targetYamlPath = path_1.default.resolve(projectPath, exports.YAML_SOURCE_FOLDER, "functions.yaml");
-        const targetFiles = [targetEnvPath, targetFunctionPath, targetGitignorePath, targetReadmePath, targetYamlPath];
+        const targetYamlPath = path_1.default.resolve(projectPath, exports.YAML_SOURCE_FOLDER, exports.TARGET_YAML_FILE);
+        const targetFiles = [targetEnvPath, targetSamplesPath, targetGitignorePath, targetReadmePath, targetYamlPath];
         if (fs_1.default.existsSync(projectPath)) {
             // check if any of the target files exists in the current directory
             const filesToBeOverwritten = [];
@@ -76,7 +77,7 @@ function init() {
                 }
             }
             if (filesToBeOverwritten.length > 0) {
-                console.warn(`\nWARNING: The following files will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`);
+                console.warn(`\nWARNING: The following files or folders will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`);
                 const confirm = yield (0, prompts_1.default)({
                     type: "confirm",
                     name: "value",
@@ -90,7 +91,7 @@ function init() {
         }
         // create folder structure
         fs_1.default.mkdirSync(projectPath, { recursive: true });
-        const folders = [exports.YAML_SOURCE_FOLDER, exports.FUNCTION_CODE_FOLDER];
+        const folders = [exports.YAML_SOURCE_FOLDER, exports.SAMPLES_CODE_FOLDER];
         for (const folder of folders) {
             fs_1.default.mkdirSync(path_1.default.resolve(projectPath, folder), { recursive: true });
         }
@@ -108,9 +109,9 @@ function init() {
         // copy EXAMPLE_YAML.yaml to project folder
         const sourceYamlPath = path_1.default.resolve(__dirname, "../public/EXAMPLE_YAML.yaml");
         fs_1.default.copyFileSync(sourceYamlPath, targetYamlPath);
-        // copy example function code to project folder
-        const sourceFunctionPath = path_1.default.resolve(__dirname, "../public/echo_function.ts");
-        fs_1.default.copyFileSync(sourceFunctionPath, targetFunctionPath);
+        // copy code samples to project folder
+        const sourceSamplesPath = path_1.default.resolve(__dirname, `../public/${exports.SAMPLES_CODE_FOLDER}`);
+        fs_1.default.cpSync(sourceSamplesPath, targetSamplesPath, { recursive: true });
         // copy PROJECT_README.md to project project
         const sourceReadmePath = path_1.default.resolve(__dirname, "../public/PROJECT_README.md");
         fs_1.default.copyFileSync(sourceReadmePath, targetReadmePath);

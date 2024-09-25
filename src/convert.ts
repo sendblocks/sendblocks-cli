@@ -21,3 +21,19 @@ export const convertHexOrDecimal = (value: string) => {
         return convertDecimalToHex(parseInt(value));
     }
 };
+
+export function convertBase64ToString(base64Code: string) {
+    return Buffer.from(base64Code, "base64").toString("utf-8");
+}
+
+export function convertStringToBase64(str: string) {
+    return Buffer.from(str).toString("base64");
+}
+
+export function forceHexOrDecimalToDecimal(value: string | number): number {
+    if (value.toString().substring(0, 2) === "0x") {
+        return convertHexToDecimal(value.toString());
+    }
+
+    return Number(value);
+}

@@ -5,13 +5,15 @@ import { YAML_SOURCE_FOLDER } from "./project";
 
 export type Spec = Record<string, any>;
 
-export function listYamlFiles(): string[] {
+export function listYamlFiles(options: { quiet?: boolean } = {}): string[] {
     // get the list of yaml files in the yaml src folder
     const yamlFiles = fs
         .readdirSync(YAML_SOURCE_FOLDER)
         .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
-    console.log(`Found ${yamlFiles.length} yaml files in ${YAML_SOURCE_FOLDER} folder`);
-    if (yamlFiles.length > 0) {
+    if (!options.quiet) {
+        console.log(`Found ${yamlFiles.length} yaml files in ${YAML_SOURCE_FOLDER} folder`);
+    }
+    if (yamlFiles.length > 0 && !options.quiet) {
         console.log(" -", yamlFiles.join("\n - "));
     }
 
@@ -20,6 +22,7 @@ export function listYamlFiles(): string[] {
 
 export async function mergeYamlFiles(yamlFiles: string[]): Promise<Spec> {
     const spec: Spec = {
+        subgraphs: {},
         webhooks: {},
         functions: {},
     };

@@ -1,12 +1,16 @@
 import fs from "fs";
 import path from "path";
 
+import { convertStringToBase64 } from "./convert";
 import * as functionTriggers from "./function-triggers";
 import * as functions from "./functions";
 import { Spec } from "./sb-yaml";
+import * as subgraphs from "./subgraphs";
 import * as webhooks from "./webhooks";
+import { blobToBase64, zipFolder } from "./zip-tools";
 
 type StateComparisonResult = {
+    subgraphs: ResourceStateChanges;
     webhooks: ResourceStateChanges;
     functions: ResourceStateChanges;
 };
@@ -42,9 +46,57 @@ export async function generateStateChanges(spec: Spec) {
     console.log("Comparing state...");
 
     const result: StateComparisonResult = {
+        subgraphs: newResourceStateChanges(),
         webhooks: newResourceStateChanges(),
         functions: newResourceStateChanges(),
     };
+
+    // subgraphs
+
+    let sendblocksSubgraphs: {
+        [name: string]: any;
+    };
+    try {
+        sendblocksSubgraphs = await subgraphs.getSubgraphDictionary();
+    } catch (error) {
+        throw new Error(`Error occurred while fetching subgraphs: ${error}`);
+    }
+    for (const specItem in spec.subgraphs) {
+        const specSubgraph = spec.subgraphs[specItem];
+        // replace the spec's schema file reference with the graphql schema itself
+        specSubgraph.schema = convertStringToBase64(fs.readFileSync(path.resolve(specSubgraph.schema)).toString());
+
+        const sendblocksSubgraphName = sendblocksSubgraphs[specItem];
+        if (!sendblocksSubgraphName) {
+            result.subgraphs.added.push({
+                schema_name: specItem,
+                schema: specSubgraph.schema,
+            });
+        } else {
+            // if the schema is in the sendblocksSubgraphs, retrieve the existing schema
+            // and check if the schema has changed
+            if (Object.keys(sendblocksSubgraphs).includes(specItem)) {
+                const sendblocksSubgraph = (await subgraphs.getSubgraphSchema(specItem)).data;
+                if (subgraphs.isSubgraphChanged(specItem, sendblocksSubgraph, specSubgraph)) {
+                    result.subgraphs.changed.push({
+                        schema_name: specItem,
+                        schema: specSubgraph.schema,
+                    });
+                } else {
+                    result.subgraphs.unchanged.push({
+                        schema_name: specItem,
+                    });
+                }
+            }
+        }
+    }
+    for (const schema_name in sendblocksSubgraphs) {
+        if (!Object.keys(spec.subgraphs).includes(schema_name)) {
+            result.webhooks.unreferenced.push({
+                schema_name: schema_name,
+            });
+        }
+    }
 
     // webhooks
 
@@ -128,14 +180,23 @@ export async function generateStateChanges(spec: Spec) {
         }
         specFunction.webhook_id = webhook.webhook_id;
 
-        // replace the spec's function code file reference with the code itself
-        specFunction.code = fs.readFileSync(path.resolve(specFunction.code)).toString();
+        // the function spec must include either code or source fields
+        if ((!specFunction.code && !specFunction.source) || (specFunction.code && specFunction.source)) {
+            throw new Error(`Function ${specItem} must either include "code" or "source" fields`);
+        }
+
+        if (specFunction.code) {
+            // replace the spec's function code file reference with the code itself
+            specFunction.code = convertStringToBase64(fs.readFileSync(path.resolve(specFunction.code)).toString());
+        }
+
+        if (specFunction.source) {
+            // zip the source directory and encode it as base64
+            specFunction.code = await blobToBase64(await zipFolder(specFunction.source));
+        }
 
         const sendblocksFunction = sendblocksFunctions[specItem];
         if (!sendblocksFunction) {
-            if (!specFunction.triggers || specFunction.triggers.length === 0) {
-                throw new Error(`Function ${specItem} has no triggers defined`);
-            }
             for (const trigger of specFunction.triggers) {
                 try {
                     functionTriggers.validateFunctionTrigger(trigger);
@@ -152,16 +213,31 @@ export async function generateStateChanges(spec: Spec) {
         } else {
             // get the existing function code from sendblocks
             sendblocksFunction.code = await functions.getFunctionCode(sendblocksFunction.function_id);
-            if (functions.isFunctionChanged(specItem, sendblocksFunction, specFunction)) {
+            if (await functions.isFunctionChanged(specItem, sendblocksFunction, specFunction)) {
+                const areTriggersChanged = functionTriggers.areFunctionTriggersChanged(
+                    sendblocksFunction.triggers,
+                    specFunction.triggers,
+                );
+                if (areTriggersChanged) {
+                    // validate triggers
+                    for (const trigger of specFunction.triggers) {
+                        try {
+                            functionTriggers.validateFunctionTrigger(trigger);
+                        } catch (error: any) {
+                            throw new Error(`Function ${specItem} has an invalid trigger: ${error.message}`);
+                        }
+                    }
+                }
+
                 result.functions.changed.push({
                     function_name: specItem,
                     ...specFunction,
                     function_id: sendblocksFunction.function_id,
                     changes: [
-                        sendblocksFunction.code !== specFunction.code ? "code" : "",
-                        functionTriggers.areFunctionTriggersChanged(sendblocksFunction.triggers, specFunction.triggers)
-                            ? "triggers"
+                        (await functions.isFunctionCodeChanged(sendblocksFunction.code, specFunction.code))
+                            ? "code"
                             : "",
+                        areTriggersChanged ? "triggers" : "",
                         sendblocksFunction.webhook_id !== specFunction.webhook_id ? "webhook" : "",
                         sendblocksFunction.should_send_std_streams !==
                         should_send_std_streams(specFunction.should_send_std_streams)

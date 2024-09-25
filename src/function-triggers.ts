@@ -13,15 +13,6 @@ const VALID_LOCATIONS: string[] = [
     "storage_address",
 ];
 
-const VALID_TRIGGERS = [
-    "TRIGGER_TYPE_ADDRESS",
-    "TRIGGER_TYPE_EVENT",
-    "TRIGGER_TYPE_FUNCTION",
-    "TRIGGER_TYPE_NEW_BLOCK",
-    "TRIGGER_TYPE_NEW_CONTRACT",
-    "TRIGGER_TYPE_STORAGE_ACCESS",
-];
-
 function isAddressTriggerTypeChanged(
     sendblocksFunctionTrigger: components["schemas"]["AddressTriggerData"],
     specFunctionTrigger: components["schemas"]["AddressTriggerData"],
@@ -29,16 +20,25 @@ function isAddressTriggerTypeChanged(
     if (sendblocksFunctionTrigger.address.toLowerCase() != specFunctionTrigger.address.toLowerCase()) {
         return true;
     }
-    if (sendblocksFunctionTrigger.locations?.length != specFunctionTrigger.locations?.length) {
-        return true;
+    // convert location arrays to sets and back to arrays to remove duplicates
+    const sendblocksLocations = sendblocksFunctionTrigger.locations
+        ? [...new Set(sendblocksFunctionTrigger.locations)]
+        : [];
+    const specLocations = specFunctionTrigger.locations ? [...new Set(specFunctionTrigger.locations)] : [];
+    if (sendblocksLocations.length != specLocations.length) {
+        // special case: if the spec locations are null, and the sendblocks locations include every
+        //               location, we consider the trigger to be the same.
+        // TODO: remove this special case, see https://app.clickup.com/t/9003190095/8695u071p
+        const specialCase =
+            !specFunctionTrigger.locations && sendblocksFunctionTrigger.locations?.length == VALID_LOCATIONS.length;
+        if (!specialCase) {
+            return true;
+        }
     }
-    if (sendblocksFunctionTrigger.locations && specFunctionTrigger.locations) {
-        for (const sendblocksItem of sendblocksFunctionTrigger.locations) {
-            for (const specItem of specFunctionTrigger.locations) {
-                if (sendblocksItem.localeCompare(specItem)) {
-                    return true;
-                }
-            }
+    // check that each location in the spec triggers is in the sendblocks triggers
+    for (const specItem of specLocations) {
+        if (!sendblocksLocations.includes(specItem)) {
+            return true;
         }
     }
     return false;
@@ -49,6 +49,11 @@ function isEventTriggerTypeChanged(
     specFunctionTrigger: components["schemas"]["EventTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.event != specFunctionTrigger.event) {
+        return true;
+    }
+    if (
+        sendblocksFunctionTrigger.emitter_address?.toLowerCase() != specFunctionTrigger.emitter_address?.toLowerCase()
+    ) {
         return true;
     }
     return false;
@@ -209,8 +214,9 @@ function validateAddressTriggerType(trigger: components["schemas"]["AddressTrigg
 
 function validateEventTriggerType(trigger: components["schemas"]["EventTriggerData"]) {
     const errorPrefix = "Invalid Event Trigger:";
+    // we require at least the event signature
     if (!trigger.event) {
-        throw new Error(`${errorPrefix} Event is required.`);
+        throw new Error(`${errorPrefix} Event signature is required.`);
     }
     return true;
 }
@@ -256,7 +262,8 @@ export function validateFunctionTrigger(
     if (!trigger) {
         throw new Error("Trigger is required.");
     }
-    switch (trigger.type) {
+    const triggerType = trigger.type;
+    switch (triggerType) {
         case "TRIGGER_TYPE_ADDRESS":
             return validateAddressTriggerType(trigger);
         case "TRIGGER_TYPE_EVENT":
@@ -270,7 +277,7 @@ export function validateFunctionTrigger(
         case "TRIGGER_TYPE_STORAGE_ACCESS":
             return validateStorageAccessTriggerType(trigger);
         default:
-            throw new Error("A valid trigger type is required.");
+            throw new Error(`${triggerType} not recognized. A valid trigger type is required.`);
     }
     return true;
 }

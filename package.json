@@ -1,7 +1,7 @@
 {
   "name": "sendblocks-cli",
   "author": "SendBlocks",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "A CLI tool for interacting with the SendBlocks platform.",
   "main": "dist/index.js",
   "bin": {
@@ -30,15 +30,19 @@
   "license": "ISC",
   "dependencies": {
     "@types/prompts": "^2.4.9",
+    "@zip.js/zip.js": "^2.7.52",
     "commander": "^12.0.0",
     "dotenv": "^16.4.5",
+    "fast-glob": "^3.3.2",
+    "graphql": "^16.9.0",
     "openapi-typescript-fetch": "^2.0.0",
+    "prettier": "^3.3.3",
     "prompts": "^2.4.2",
     "yaml": "^2.4.1"
   },
   "devDependencies": {
-    "openapi-typescript": "^6.7.6",
     "@types/node": "^20.11.30",
+    "openapi-typescript": "^6.7.6",
     "typescript": "^5.4.3"
   }
 }

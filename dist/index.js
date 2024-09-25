@@ -40,7 +40,9 @@ const convert_1 = require("./convert");
 const deploy_1 = require("./deploy");
 const destroy_1 = require("./destroy");
 const functions = __importStar(require("./functions"));
+const codegen_1 = require("./graphql/codegen");
 const project_1 = require("./project");
+const subgraphs = __importStar(require("./subgraphs"));
 const webhooks = __importStar(require("./webhooks"));
 const program = new commander_1.Command();
 const cliCommandNames = Object.keys(package_json_1.bin);
@@ -130,48 +132,126 @@ program
         process.exit(1);
     }
 }));
-program
-    .command("functions")
-    .argument("<command>", "Command to execute [list, delete]")
-    .argument("[name]", "Name of the function")
-    .action((command, name) => __awaiter(void 0, void 0, void 0, function* () {
+const functionsCommand = program.command("functions");
+functionsCommand
+    .command("list")
+    .description("List all functions.")
+    .action(() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        switch (command) {
-            case "list":
-                console.log("Listing functions...");
-                console.log(yield functions.listFunctions());
-                break;
-            case "delete":
-                console.log("Deleting function...");
-                console.log(yield functions.deleteFunction(name));
-                break;
-            default:
-                console.error("Invalid command!");
-        }
+        console.log("Listing functions...");
+        console.log(yield functions.listFunctions());
     }
     catch (error) {
         console.error(error.message);
         process.exit(1);
     }
 }));
-program
-    .command("webhooks")
-    .argument("<command>", "Command to execute [list, delete]")
-    .argument("[name]", "Name of the webhook")
-    .action((command, name) => __awaiter(void 0, void 0, void 0, function* () {
+functionsCommand
+    .command("delete")
+    .description("Delete a function.")
+    .argument("<name>", "Name of the function")
+    .action((name) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        switch (command) {
-            case "list":
-                console.log("Listing webhooks...");
-                console.log(yield webhooks.listWebhooks());
-                break;
-            case "delete":
-                console.log("Deleting webhook...");
-                console.log(yield webhooks.deleteWebhook(name));
-                break;
-            default:
-                console.error("Invalid command!");
+        console.log("Deleting function...");
+        console.log(yield functions.deleteFunction(name));
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+functionsCommand
+    .command("replay-blocks")
+    .description("Replay blocks for a given set of functions.")
+    .option("--start <start block>", "Start block number (decimal or hex)")
+    .option("--end <end block>", "End block number (decimal or hex)")
+    .option("--functions <functions>", "Comma-separated list of function names")
+    .action((options) => __awaiter(void 0, void 0, void 0, function* () {
+    const missingArgs = ["start", "end"].filter((arg) => !options[arg]);
+    if (missingArgs.length > 0) {
+        console.error(`Missing required argument(s): ${missingArgs.join(", ")}`);
+        process.exit(1);
+    }
+    try {
+        let functionNames = [];
+        if (options.functions) {
+            functionNames = options.functions.split(",").map((f) => f.trim());
         }
+        const functionsText = functionNames.length > 0
+            ? `functions ${JSON.stringify(functionNames)}`
+            : "all deployed functions in spec";
+        console.log(`Replaying blocks ${options.start} through ${options.end} for ${functionsText}...`);
+        yield functions.replayBlocks(functionNames, options.start, options.end);
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+const webhooksCommand = program.command("webhooks");
+webhooksCommand
+    .command("list")
+    .description("List all webhooks.")
+    .action(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Listing webhooks...");
+        console.log(yield webhooks.listWebhooks());
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+webhooksCommand
+    .command("delete")
+    .description("Delete a webhook.")
+    .argument("<name>", "Name of the webhook")
+    .action((name) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Deleting webhook...");
+        console.log(yield webhooks.deleteWebhook(name));
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+const subgraphsCommand = program.command("subgraphs");
+subgraphsCommand
+    .command("list")
+    .description("List all subgraph schemas.")
+    .action(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Listing subgraph schemas...");
+        console.log(yield subgraphs.listSubgraphSchemas());
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+subgraphsCommand
+    .command("delete")
+    .description("Delete a subgraph schema.")
+    .argument("<name>", "Name of the subgraph schema")
+    .action((name) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Deleting subgraph schema...");
+        console.log(yield subgraphs.deleteSubgraphSchema(name));
+    }
+    catch (error) {
+        console.error(error.message);
+        process.exit(1);
+    }
+}));
+subgraphsCommand
+    .command("gen")
+    .description("Generate typescript types from a graphql file")
+    .option("-s, --source <file>", "Path to the graphql file, defaults to schema.graphql", "schema.graphql")
+    .option("-o, --output <file>", "Path to the output file, defaults to <source file>.ts")
+    .action((options) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(yield (0, codegen_1.generateCode)(options));
     }
     catch (error) {
         console.error(error.message);

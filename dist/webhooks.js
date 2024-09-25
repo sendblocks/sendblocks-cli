@@ -110,7 +110,7 @@ function deploy(stateChanges) {
             results.push({
                 skipped: true,
                 webhook_name: updatedWebhook.webhook_name,
-                response: `Webhook updates not yet supported`,
+                response: `Webhook updates not supported`,
             });
         }
         for (const unchangedWebhook of [...stateChanges.unchanged, ...stateChanges.unreferenced]) {

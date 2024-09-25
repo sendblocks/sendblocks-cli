@@ -7,7 +7,9 @@ import { convertHexOrDecimal } from "./convert";
 import { deploy } from "./deploy";
 import { destroy } from "./destroy";
 import * as functions from "./functions";
+import { generateCode } from "./graphql/codegen";
 import { getSetEnvironment, init } from "./project";
+import * as subgraphs from "./subgraphs";
 import * as webhooks from "./webhooks";
 
 const program = new Command();
@@ -100,48 +102,122 @@ program
         }
     });
 
-program
-    .command("functions")
-    .argument("<command>", "Command to execute [list, delete]")
-    .argument("[name]", "Name of the function")
-    .action(async (command, name) => {
+const functionsCommand = program.command("functions");
+functionsCommand
+    .command("list")
+    .description("List all functions.")
+    .action(async () => {
         try {
-            switch (command) {
-                case "list":
-                    console.log("Listing functions...");
-                    console.log(await functions.listFunctions());
-                    break;
-                case "delete":
-                    console.log("Deleting function...");
-                    console.log(await functions.deleteFunction(name));
-                    break;
-                default:
-                    console.error("Invalid command!");
+            console.log("Listing functions...");
+            console.log(await functions.listFunctions());
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+functionsCommand
+    .command("delete")
+    .description("Delete a function.")
+    .argument("<name>", "Name of the function")
+    .action(async (name) => {
+        try {
+            console.log("Deleting function...");
+            console.log(await functions.deleteFunction(name));
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+functionsCommand
+    .command("replay-blocks")
+    .description("Replay blocks for a given set of functions.")
+    .option("--start <start block>", "Start block number (decimal or hex)")
+    .option("--end <end block>", "End block number (decimal or hex)")
+    .option("--functions <functions>", "Comma-separated list of function names")
+    .action(async (options: any) => {
+        const missingArgs = ["start", "end"].filter((arg) => !options[arg]);
+        if (missingArgs.length > 0) {
+            console.error(`Missing required argument(s): ${missingArgs.join(", ")}`);
+            process.exit(1);
+        }
+        try {
+            let functionNames: string[] = [];
+            if (options.functions) {
+                functionNames = options.functions.split(",").map((f: string) => f.trim());
             }
+            const functionsText =
+                functionNames.length > 0
+                    ? `functions ${JSON.stringify(functionNames)}`
+                    : "all deployed functions in spec";
+            console.log(`Replaying blocks ${options.start} through ${options.end} for ${functionsText}...`);
+            await functions.replayBlocks(functionNames, options.start, options.end);
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);
         }
     });
 
-program
-    .command("webhooks")
-    .argument("<command>", "Command to execute [list, delete]")
-    .argument("[name]", "Name of the webhook")
-    .action(async (command, name) => {
+const webhooksCommand = program.command("webhooks");
+webhooksCommand
+    .command("list")
+    .description("List all webhooks.")
+    .action(async () => {
         try {
-            switch (command) {
-                case "list":
-                    console.log("Listing webhooks...");
-                    console.log(await webhooks.listWebhooks());
-                    break;
-                case "delete":
-                    console.log("Deleting webhook...");
-                    console.log(await webhooks.deleteWebhook(name));
-                    break;
-                default:
-                    console.error("Invalid command!");
-            }
+            console.log("Listing webhooks...");
+            console.log(await webhooks.listWebhooks());
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+webhooksCommand
+    .command("delete")
+    .description("Delete a webhook.")
+    .argument("<name>", "Name of the webhook")
+    .action(async (name) => {
+        try {
+            console.log("Deleting webhook...");
+            console.log(await webhooks.deleteWebhook(name));
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+
+const subgraphsCommand = program.command("subgraphs");
+subgraphsCommand
+    .command("list")
+    .description("List all subgraph schemas.")
+    .action(async () => {
+        try {
+            console.log("Listing subgraph schemas...");
+            console.log(await subgraphs.listSubgraphSchemas());
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+subgraphsCommand
+    .command("delete")
+    .description("Delete a subgraph schema.")
+    .argument("<name>", "Name of the subgraph schema")
+    .action(async (name) => {
+        try {
+            console.log("Deleting subgraph schema...");
+            console.log(await subgraphs.deleteSubgraphSchema(name));
+        } catch (error: any) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    });
+subgraphsCommand
+    .command("gen")
+    .description("Generate typescript types from a graphql file")
+    .option("-s, --source <file>", "Path to the graphql file, defaults to schema.graphql", "schema.graphql")
+    .option("-o, --output <file>", "Path to the output file, defaults to <source file>.ts")
+    .action(async (options) => {
+        try {
+            console.log(await generateCode(options));
         } catch (error: any) {
             console.error(error.message);
             process.exit(1);

@@ -16,13 +16,15 @@ exports.mergeYamlFiles = exports.listYamlFiles = void 0;
 const fs_1 = __importDefault(require("fs"));
 const yaml_1 = require("yaml");
 const project_1 = require("./project");
-function listYamlFiles() {
+function listYamlFiles(options = {}) {
     // get the list of yaml files in the yaml src folder
     const yamlFiles = fs_1.default
         .readdirSync(project_1.YAML_SOURCE_FOLDER)
         .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
-    console.log(`Found ${yamlFiles.length} yaml files in ${project_1.YAML_SOURCE_FOLDER} folder`);
-    if (yamlFiles.length > 0) {
+    if (!options.quiet) {
+        console.log(`Found ${yamlFiles.length} yaml files in ${project_1.YAML_SOURCE_FOLDER} folder`);
+    }
+    if (yamlFiles.length > 0 && !options.quiet) {
         console.log(" -", yamlFiles.join("\n - "));
     }
     return yamlFiles;
@@ -31,6 +33,7 @@ exports.listYamlFiles = listYamlFiles;
 function mergeYamlFiles(yamlFiles) {
     return __awaiter(this, void 0, void 0, function* () {
         const spec = {
+            subgraphs: {},
             webhooks: {},
             functions: {},
         };

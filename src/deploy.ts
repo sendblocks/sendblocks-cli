@@ -3,9 +3,11 @@ import prompts from "prompts";
 import * as functions from "./functions";
 import { listYamlFiles, mergeYamlFiles } from "./sb-yaml";
 import { generateStateChanges } from "./state-diff";
+import * as subgraphs from "./subgraphs";
 import * as webhooks from "./webhooks";
 
 type StateComparisonResult = {
+    subgraphs: ResourceStateChanges;
     webhooks: ResourceStateChanges;
     functions: ResourceStateChanges;
 };
@@ -27,13 +29,15 @@ export async function deploy({
     }
 
     if (dryRun) {
-        console.log("Dry-run complete! No resources were destroyed.");
+        console.log("Dry-run complete! No changes were deployed.");
         return;
     }
 
     if (
+        stateChanges.subgraphs.added.length === 0 &&
         stateChanges.webhooks.added.length === 0 &&
         stateChanges.functions.added.length === 0 &&
+        stateChanges.subgraphs.changed.length === 0 &&
         stateChanges.webhooks.changed.length === 0 &&
         stateChanges.functions.changed.length === 0
     ) {
@@ -55,11 +59,14 @@ export async function deploy({
         // deploy the changes
         console.log("Deploying changes...\n");
 
+        const subgraphResults = await subgraphs.deploy(stateChanges.subgraphs);
         const webhookResults = await webhooks.deploy(stateChanges.webhooks);
         const functionResults = await functions.deploy(stateChanges.functions, webhookResults);
 
         console.log("\nDeployment complete!");
 
+        console.log("\nSubgraph deployment results:");
+        console.table(subgraphResults, ["schema_name", "deployed", "skipped", "response"]);
         console.log("\nWebhook deployment results:");
         console.table(webhookResults, ["webhook_name", "webhook_id", "deployed", "skipped", "response"]);
         console.log("Function deployment results:");
@@ -69,6 +76,24 @@ export async function deploy({
 
 function printStateChanges(stateChanges: StateComparisonResult) {
     // print a table showing the differences between the states
+    console.log("Subgraphs:");
+    if (stateChanges.subgraphs.added.length > 0) {
+        console.log(" - To be created:");
+        console.table(stateChanges.subgraphs.added, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.changed.length > 0) {
+        console.log(" - Changed:");
+        console.table(stateChanges.subgraphs.changed, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.unchanged.length > 0) {
+        console.log(" - Unchanged:");
+        console.table(stateChanges.subgraphs.unchanged, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.unreferenced.length > 0) {
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.subgraphs.unreferenced, ["schema_name"]);
+    }
+
     console.log("Webhooks:");
     if (stateChanges.webhooks.added.length > 0) {
         console.log(" - To be created:");
@@ -86,6 +111,7 @@ function printStateChanges(stateChanges: StateComparisonResult) {
         console.log(" - Unreferenced:");
         console.table(stateChanges.webhooks.unreferenced, ["webhook_name", "url", "webhook_id"]);
     }
+
     console.log("Functions:");
     if (stateChanges.functions.added.length > 0) {
         console.log(" - To be created:");

@@ -8,8 +8,8 @@ export interface paths {
   "/api/v1/contracts": {
     /** Get Analyzed Contract */
     get: operations["get_analyzed_contract_api_v1_contracts_get"];
-    /** Analyze */
-    post: operations["analyze_api_v1_contracts_post"];
+    /** Analyze Contract */
+    post: operations["analyze_contract_api_v1_contracts_post"];
   };
   "/api/v1/events": {
     /** Get Events */
@@ -105,16 +105,34 @@ export interface paths {
   "/api/v1/storage/namespaces/{namespace_id}/values": {
     /** Get Namespace Storage */
     get: operations["get_namespace_storage_api_v1_storage_namespaces__namespace_id__values_get"];
+    /** Save Key In Namespace Storage */
+    post: operations["save_key_in_namespace_storage_api_v1_storage_namespaces__namespace_id__values_post"];
     /** Delete Namespace Storage */
     delete: operations["delete_namespace_storage_api_v1_storage_namespaces__namespace_id__values_delete"];
   };
   "/api/v1/storage/namespaces/{namespace_id}/values/{key}": {
     /** Get Key From Namespace Storage */
     get: operations["get_key_from_namespace_storage_api_v1_storage_namespaces__namespace_id__values__key__get"];
-    /** Save Key In Namespace Storage */
-    post: operations["save_key_in_namespace_storage_api_v1_storage_namespaces__namespace_id__values__key__post"];
     /** Delete Key From Namespace Storage */
     delete: operations["delete_key_from_namespace_storage_api_v1_storage_namespaces__namespace_id__values__key__delete"];
+  };
+  "/api/v1/subgraph/schema": {
+    /** Create Schema */
+    post: operations["create_schema_api_v1_subgraph_schema_post"];
+  };
+  "/api/v1/subgraph": {
+    /** List Schemas */
+    get: operations["list_schemas_api_v1_subgraph_get"];
+  };
+  "/api/v1/subgraph/schema/{schema_name}": {
+    /** Get Schema */
+    get: operations["get_schema_api_v1_subgraph_schema__schema_name__get"];
+    /** Delete Schema */
+    delete: operations["delete_schema_api_v1_subgraph_schema__schema_name__delete"];
+  };
+  "/api/v1/subgraph/schema/query/{schema_name}": {
+    /** Query Schema */
+    post: operations["query_schema_api_v1_subgraph_schema_query__schema_name__post"];
   };
   "/api/v1/webhooks": {
     /** List Webhooks */
@@ -139,6 +157,10 @@ export interface paths {
     get: operations["get_template_api_v1_notifications_templates__template_id__get"];
     /** Delete Template */
     delete: operations["delete_template_api_v1_notifications_templates__template_id__delete"];
+  };
+  "/api/v1/notifications/templates/{template_id}/invoke": {
+    /** Invoke Notifications From Template */
+    post: operations["invoke_notifications_from_template_api_v1_notifications_templates__template_id__invoke_post"];
   };
   "/api/v1/notifications/users/{id}": {
     /** Delete User */
@@ -197,7 +219,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_POLYGON_MAINNET";
       /**
        * Contract Address
        * @description EVM address of the contract
@@ -256,6 +278,12 @@ export interface components {
        */
       event: string;
       /**
+       * Emitter Address
+       * @description Emitter address to set trigger on
+       * @example 0x283af0b28c62c092c9727f1ee09c02ca627eb
+       */
+      emitter_address?: string;
+      /**
        * Custom parameters
        * @description Parameters to be passed to the function when it is triggered by this trigger
        * @example {
@@ -294,6 +322,8 @@ export interface components {
       function_code: string;
       /** Function Code File Listing */
       function_code_file_listing?: Record<string, never>[];
+      /** Description */
+      description?: string;
     };
     /** FuncInfoPatch */
     FuncInfoPatch: {
@@ -317,7 +347,7 @@ export interface components {
       webhook_id?: string;
       /**
        * Function code
-       * @description Your function code (or zip file containing a main.ts / main.js entry point) encoded in base 64
+       * @description Your function code (or zip file containing a main.ts / main.js entry point) encoded in Base64
        * @example ZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHRyaWdnZXJIYW5kbGVyKGNvbnRleHQsIGRhdGEpIHsKICAgIHJldHVybiB7ImNvbnRleHQiOiBjb250ZXh0LCAiZGF0YSI6ZGF0YX07Cn0=
        */
       function_code?: string;
@@ -332,6 +362,12 @@ export interface components {
        * @description Change the triggers that will invoke the function.
        */
       triggers?: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"])[];
+      /**
+       * Description
+       * @description A description of the function
+       * @example This function parses USDC transfers
+       */
+      description?: string;
     };
     /** Function Trigger */
     FunctionTriggerData: {
@@ -367,7 +403,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_FANTOM_MAINNET" | "CHAIN_BASE_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * Trigger
        * @description Trigger that will invoke the function
@@ -384,6 +420,20 @@ export interface components {
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /** InvokeNotificationsRequest */
+    InvokeNotificationsRequest: {
+      /**
+       * Template parameters
+       * @description The parameters will be passed to your function as key-value pairs inside the data object
+       * @example {
+       *   "key": "value",
+       *   "key2": "value2"
+       * }
+       */
+      params?: {
+        [key: string]: string;
+      };
     };
     /** New Block Trigger */
     NewBlockTriggerData: {
@@ -488,6 +538,19 @@ export interface components {
       /** Pages */
       pages?: number;
     };
+    /** Page[StorageItem] */
+    Page_StorageItem_: {
+      /** Items */
+      items: components["schemas"]["StorageItem"][];
+      /** Total */
+      total?: number;
+      /** Page */
+      page?: number;
+      /** Size */
+      size?: number;
+      /** Pages */
+      pages?: number;
+    };
     /** Page[VariableStorageMapping] */
     Page_VariableStorageMapping_: {
       /** Items */
@@ -505,6 +568,19 @@ export interface components {
     Page_WebhookInfo_: {
       /** Items */
       items: components["schemas"]["WebhookInfo"][];
+      /** Total */
+      total?: number;
+      /** Page */
+      page?: number;
+      /** Size */
+      size?: number;
+      /** Pages */
+      pages?: number;
+    };
+    /** Page[str] */
+    Page_str_: {
+      /** Items */
+      items: string[];
       /** Total */
       total?: number;
       /** Page */
@@ -558,7 +634,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_FANTOM_MAINNET" | "CHAIN_BASE_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * StartBlockNumber
        * @description The first block number that will be replayed
@@ -569,12 +645,6 @@ export interface components {
        * @description The last block number that will be replayed
        */
       end_block_number: number;
-      /**
-       * XLFlag
-       * @description If true, invokes extended replay. This is used when replaying a large number of blocks
-       * @default false
-       */
-      xl_flag?: boolean;
     };
     /** RpcApiKeyId */
     RpcApiKeyId: {
@@ -605,7 +675,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_STARKNET_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_FANTOM_MAINNET" | "CHAIN_BASE_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * Triggers
        * @description Triggers that will invoke the function
@@ -625,7 +695,7 @@ export interface components {
       function_name: string;
       /**
        * Function code
-       * @description Your function code encoded in base 64
+       * @description Your function code (or zip file containing a main.ts / main.js entry point) encoded in Base64
        * @example ZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHRyaWdnZXJIYW5kbGVyKGNvbnRleHQsIGRhdGEpIHsKICAgIHJldHVybiB7ImNvbnRleHQiOiBjb250ZXh0LCAiZGF0YSI6ZGF0YX07Cn0=
        */
       function_code: string;
@@ -636,11 +706,30 @@ export interface components {
        * @example true
        */
       should_send_std_streams?: boolean;
+      /**
+       * Description
+       * @description A description of the function
+       * @example This function parses USDC transfers
+       */
+      description?: string;
     };
     /** SaveFunctionResponse */
     SaveFunctionResponse: {
       /** Function Id */
       function_id?: string;
+    };
+    /** SaveKvRequest */
+    SaveKvRequest: {
+      /**
+       * Key Name
+       * @example counter
+       */
+      key: string;
+      /**
+       * The actual value
+       * @description Can be a number, boolean, list, object, or string
+       */
+      value: number | boolean | unknown[] | Record<string, never> | string;
     };
     /** SavePublicShareRequest */
     SavePublicShareRequest: {
@@ -695,6 +784,36 @@ export interface components {
       /** Wallet Address */
       wallet_address: string;
     };
+    /** SchemaRequest */
+    SchemaRequest: {
+      /**
+       * Name of the schema
+       * @description A descriptive schema name
+       * @example defi
+       */
+      name: string;
+      /**
+       * GraphQL schema
+       * @description Base64-encoded GraphQL schema
+       * @example dHlwZSBQb29sIHsKICBpZDogSUQhCiAgbmFtZTogU3RyaW5nIQogIGNyZWF0ZWQ6IFRpbWVzdGFtcCEKICBwb3NpdGlvbnM6IFtQb3NpdGlvbiFdISBAZGVyaXZlZEZyb20oZmllbGQ6ICJwb29sIikKICBxdWFsaXR5OiBRdWFsaXR5IQp9Cgp0eXBlIFBvc2l0aW9uIHsKICBpZDogSUQhCiAgbmFtZTogU3RyaW5nIQogIHBvb2w6IFBvb2whCn0KCmVudW0gUXVhbGl0eSB7CiAgICBHUkVBVAogICAgTk9UR1JFQVQKfQ==
+       */
+      schema: string;
+    };
+    /** SchemaResponse */
+    SchemaResponse: {
+      /**
+       * Name of the schema
+       * @description A descriptive schema name
+       * @example defi
+       */
+      name: string;
+      /**
+       * GraphQL schema
+       * @description Base64-encoded GraphQL schema
+       * @example dHlwZSBQb29sIHsKICBpZDogSUQhCiAgbmFtZTogU3RyaW5nIQogIGNyZWF0ZWQ6IFRpbWVzdGFtcCEKICBwb3NpdGlvbnM6IFtQb3NpdGlvbiFdISBAZGVyaXZlZEZyb20oZmllbGQ6ICJwb29sIikKICBxdWFsaXR5OiBRdWFsaXR5IQp9Cgp0eXBlIFBvc2l0aW9uIHsKICBpZDogSUQhCiAgbmFtZTogU3RyaW5nIQogIHBvb2w6IFBvb2whCn0KCmVudW0gUXVhbGl0eSB7CiAgICBHUkVBVAogICAgTk9UR1JFQVQKfQ==
+       */
+      schema: string;
+    };
     /** Stat */
     Stat: {
       /** Tenant Id */
@@ -723,6 +842,13 @@ export interface components {
       webhook_id?: string;
       /** Stats */
       stats?: string;
+    };
+    /** StorageItem */
+    StorageItem: {
+      /** Key */
+      key: string;
+      /** Value */
+      value?: unknown;
     };
     /** By Slot */
     StorageSlotTrigger: {
@@ -774,6 +900,14 @@ export interface components {
        * @example totalSupply
        */
       variable_name: string;
+    };
+    /** SubgraphQueryRequest */
+    SubgraphQueryRequest: {
+      /**
+       * Query
+       * @description The query to be executed on the subgraph
+       */
+      query: string;
     };
     /** TemplateInfo */
     TemplateInfo: {
@@ -857,7 +991,7 @@ export interface operations {
          * @description Chain for the function to run on
          * @example CHAIN_ETH_MAINNET
          */
-        chain_id?: "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_ARBITRUM_ONE" | "CHAIN_POLYGON_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET";
+        chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_POLYGON_MAINNET";
         /**
          * @description EVM address of the contract
          * @example 0x283af0b28c62c092c9727f1ee09c02ca627eb7f5
@@ -892,8 +1026,8 @@ export interface operations {
       };
     };
   };
-  /** Analyze */
-  analyze_api_v1_contracts_post: {
+  /** Analyze Contract */
+  analyze_contract_api_v1_contracts_post: {
     requestBody: {
       content: {
         "application/json": components["schemas"]["ContractRequest"];
@@ -1373,6 +1507,10 @@ export interface operations {
   /** Get Public Share */
   get_public_share_public__id__get: {
     parameters: {
+      query?: {
+        page?: number;
+        size?: number;
+      };
       path: {
         id: string;
       };
@@ -1381,7 +1519,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["Page_StorageItem_"];
         };
       };
       /** @description Data not found */
@@ -1651,6 +1789,10 @@ export interface operations {
   /** Get Namespace Storage */
   get_namespace_storage_api_v1_storage_namespaces__namespace_id__values_get: {
     parameters: {
+      query?: {
+        page?: number;
+        size?: number;
+      };
       path: {
         namespace_id: string;
       };
@@ -1659,8 +1801,41 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["Page_StorageItem_"];
         };
+      };
+      /** @description Namespace storage not found */
+      404: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Save Key In Namespace Storage */
+  save_key_in_namespace_storage_api_v1_storage_namespaces__namespace_id__values_post: {
+    parameters: {
+      path: {
+        namespace_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveKvRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
       };
       /** @description Namespace storage not found */
       404: {
@@ -1741,40 +1916,6 @@ export interface operations {
       };
     };
   };
-  /** Save Key In Namespace Storage */
-  save_key_in_namespace_storage_api_v1_storage_namespaces__namespace_id__values__key__post: {
-    parameters: {
-      path: {
-        namespace_id: string;
-        key: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      204: {
-        content: never;
-      };
-      /** @description Namespace storage not found */
-      404: {
-        content: never;
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
   /** Delete Key From Namespace Storage */
   delete_key_from_namespace_storage_api_v1_storage_namespaces__namespace_id__values__key__delete: {
     parameters: {
@@ -1791,6 +1932,130 @@ export interface operations {
       /** @description Namespace storage / key not found */
       404: {
         content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Create Schema */
+  create_schema_api_v1_subgraph_schema_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SchemaRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** List Schemas */
+  list_schemas_api_v1_subgraph_get: {
+    parameters: {
+      query?: {
+        page?: number;
+        size?: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_str_"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Get Schema */
+  get_schema_api_v1_subgraph_schema__schema_name__get: {
+    parameters: {
+      path: {
+        schema_name: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SchemaResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Delete Schema */
+  delete_schema_api_v1_subgraph_schema__schema_name__delete: {
+    parameters: {
+      path: {
+        schema_name: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Query Schema */
+  query_schema_api_v1_subgraph_schema_query__schema_name__post: {
+    parameters: {
+      path: {
+        schema_name: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SubgraphQueryRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
       };
       /** @description Validation Error */
       422: {
@@ -1977,6 +2242,31 @@ export interface operations {
     parameters: {
       path: {
         template_id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Invoke Notifications From Template */
+  invoke_notifications_from_template_api_v1_notifications_templates__template_id__invoke_post: {
+    parameters: {
+      path: {
+        template_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InvokeNotificationsRequest"];
       };
     };
     responses: {

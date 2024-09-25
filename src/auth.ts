@@ -53,7 +53,6 @@ export async function login(): Promise<string> {
         // ignore error
     }
 
-    let token: string;
     const response = await fetch(authUrl, {
         method: "POST",
         headers: {
@@ -68,7 +67,7 @@ export async function login(): Promise<string> {
         throw new Error(`Failed to login, received status code ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
-    token = data.accessToken;
+    let token = data.accessToken;
     await fs.promises.writeFile(".auth", token);
     console.log("Successfully logged in! Bearer token stored in .auth file.");
     console.log(`Bearer token: ${token}\n\n`);

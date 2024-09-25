@@ -64,7 +64,6 @@ function login() {
         catch (error) {
             // ignore error
         }
-        let token;
         const response = yield fetch(config_1.authUrl, {
             method: "POST",
             headers: {
@@ -79,7 +78,7 @@ function login() {
             throw new Error(`Failed to login, received status code ${response.status} ${response.statusText}`);
         }
         const data = yield response.json();
-        token = data.accessToken;
+        let token = data.accessToken;
         yield fs_1.default.promises.writeFile(".auth", token);
         console.log("Successfully logged in! Bearer token stored in .auth file.");
         console.log(`Bearer token: ${token}\n\n`);

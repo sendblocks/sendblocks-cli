@@ -91,7 +91,7 @@ export async function deploy(stateChanges: ResourceStateChanges) {
         results.push({
             skipped: true,
             webhook_name: updatedWebhook.webhook_name,
-            response: `Webhook updates not yet supported`,
+            response: `Webhook updates not supported`,
         });
     }
 

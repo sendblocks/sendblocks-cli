@@ -30,7 +30,7 @@ npx sendblocks-cli -h
 
 ## Project Initialization
 
-Use the `init` command to initialize the project, this will configure your folder (or a given folder) for use with the `sendblocks-cli` tool as well as initialize it with a sample `functions.yaml` configuration which will deploy an echo function.
+Use the `init` command to initialize the project, this will configure your folder (or a folder you've provided as an argument) for use with the `sendblocks-cli` tool as well as initialize it with a sample `functions.yaml` configuration which will deploy an echo function.
 
 **IMPORTANT NOTE**: If you're trying to initialize a project that's already got files in it, ensure that the files listed are safe before proceeding!
 
@@ -51,7 +51,7 @@ The following files will be modified / overwritten:
 Once your project has been initialized, you will be able to sign in to the SendBlocks API.
 For this you will require a client ID and secret, if you don't already have them then [please get in touch with us](https://sendblocks.io/#getstarted)!
 
-If you have your credentials, sign in using `sb-cli login` and the token will be stored in `.auth` and printed to your console.
+If you have your credentials, sign in using `sb-cli login` and the token will be stored in the `.auth` of your project's root folder as well as printed to your console.
 
 ```shell
 $ sb-cli login
@@ -64,40 +64,62 @@ Bearer token: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFmNjQ4NmJMIn0....
 
 If your token has expired, simply run `sb-cli login` again.
 
+## Webhooks
+
+For more details on constructing valid webhooks, see [Create Webhook](https://docs.sendblocks.io/reference/create_webhook_api_v1_webhooks_post) in our API reference.
+
+## Functions
+
+For more details on constructing valid functions, see [Create Function](https://docs.sendblocks.io/reference/create_function_api_v1_functions_post) in our API reference.
+
+### Single file functions
+
+When a function is contained within a single file, use the `code` field, and it will be uploaded as-is and editable directly via the UI.
+
+### Multi-file functions
+
+When a function's code is spread over multiple files and folders, use the `source` field to point to the function's root folder. A valid source folder must include exactly one entrypoint, either `main.ts` or `main.js`, and the entrypoint must include exactly one function handler called `triggerHandler`.
+
+As there are limitations to the size of the bundled files that can be uploaded, if any component of your code needs to be generated then it is recommended to keep your source and distribution code separate.
+
 ## Sample Resources
 
-After initializing your project, you will find a `src/functions.yaml` resource definition file along with `functions/echo_function.ts` sample function.
+After initializing your project, you will find a `src/samples.yaml` resource definition file along with a `samples` folder.
 
-The sample resource definition file includes a function and its webhook, which the `sendblocks-cli` tool will identify by their names (as opposed to using the [SendBlocks API](https://sendblocks.readme.io/reference/getting-an-access-token) directly, which relies solely on function and webhook UUIDs).
+The sample resource definition file includes a function and its webhook. It is worth noting that the `sendblocks-cli` tool identifies functions and webhooks by name, in contrast to the [SendBlocks API](https://sendblocks.readme.io/reference/) which relies exclusively on function and webhook UUIDs.
 
 ```yaml
 ---
 
 webhooks:
-  - webhook_name:
-      url: https://example.com
+  - echo_function_webhook:
+      url: https://your.webhook.url.here
       secret: "auth secret"
 
 functions:
-  - function_name:
+  - echo_function:
       chain_id: CHAIN_ETH_SEPOLIA
-      code: functions/echo_function.ts
+      code: samples/echo/echo_function.ts
+      is_enabled: true
       should_send_std_streams: true
       triggers:
         - type: TRIGGER_TYPE_ADDRESS
           address: "0x1234567890abcdef1234567890abcdef12345678"
           locations:
-            - log_emitter
-      webhook: webhook_name
+            - trace_from
+      webhook: echo_function_webhook
 
 ```
 
-The sample `function` resource points to `functions/echo_function.ts`, which is a simple echo function:
+### Echo Function
+
+The `echo_function` sample points to `samples/echo/echo_function.ts`, which is a simple function defined in a single file that simply relays its `context` and `data` objects to its webhook.
 
 ```typescript
-export function triggerHandler(context, data) {
+export function triggerHandler(context: any, data: any) {
     return { context: context, data: data };
 }
+
 ```
 
 ## Deploying Resources
@@ -166,6 +188,16 @@ Function deployment results:
 │ 1       │ 'existing_function_name' │ 'ae27803b-fb54-4edd-a458-285d6c2a843b' │          │ true    │          │
 └─────────┴──────────────────────────┴────────────────────────────────────────┴──────────┴─────────┴──────────┘
 ```
+
+## Replay Blocks for Deployed Functions
+
+In order to backfill your subgraphs (or to trigger your functions for specific blocks for any other reason), you can use the `sb-cli functions replay-blocks` command.
+
+The required arguments are `--start <start_block_number>` and `--end <end_block_number>`.
+
+To specify functions to be triggered, provide a comma-separated list of function names with the `--functions` argument.
+
+If no function names are provided, all deployed functions that are referenced in the YAML spec will be triggered (where relevant, assuming that the blocks are valid blocks for the functions' chains and that the blocks in the given range match the functions' triggers).
 
 ## Resource Destruction
 

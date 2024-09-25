@@ -40,6 +40,7 @@ const prompts_1 = __importDefault(require("prompts"));
 const functions = __importStar(require("./functions"));
 const sb_yaml_1 = require("./sb-yaml");
 const state_diff_1 = require("./state-diff");
+const subgraphs = __importStar(require("./subgraphs"));
 const webhooks = __importStar(require("./webhooks"));
 // destroy --dry-run
 function destroy() {
@@ -52,7 +53,9 @@ function destroy() {
             console.log("Dry-run complete! No resources were destroyed.");
             return;
         }
-        if (stateChanges.webhooks.changed.length === 0 &&
+        if (stateChanges.subgraphs.changed.length === 0 &&
+            stateChanges.subgraphs.unchanged.length === 0 &&
+            stateChanges.webhooks.changed.length === 0 &&
             stateChanges.webhooks.unchanged.length === 0 &&
             stateChanges.functions.changed.length === 0 &&
             stateChanges.functions.unchanged.length === 0) {
@@ -71,9 +74,12 @@ function destroy() {
         if (nonInteractive || (confirm === null || confirm === void 0 ? void 0 : confirm.value)) {
             // deploy the changes
             console.log("Deploying changes...\n");
+            const subgraphResults = yield subgraphs.destroy(stateChanges.subgraphs);
             const functionResults = yield functions.destroy(stateChanges.functions);
             const webhookResults = yield webhooks.destroy(stateChanges.webhooks, functionResults);
             console.log("\nDeployment complete!");
+            console.log("Subgraph deployment results:");
+            console.table(subgraphResults, ["schema_name", "destroyed", "skipped", "response"]);
             console.log("Function deployment results:");
             console.table(functionResults, ["function_name", "destroyed", "skipped", "response"]);
             console.log("\nWebhook deployment results:");
@@ -84,6 +90,16 @@ function destroy() {
 exports.destroy = destroy;
 function printStateChanges(stateChanges) {
     // print a table showing the differences between the states
+    console.log("Subgraphs:");
+    const combinedSubgraphChanges = [...stateChanges.subgraphs.changed, ...stateChanges.subgraphs.unchanged];
+    if (combinedSubgraphChanges.length > 0) {
+        console.log(" - To be destroyed:");
+        console.table(combinedSubgraphChanges, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.unreferenced.length > 0) {
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.subgraphs.unreferenced, ["schema_name"]);
+    }
     console.log("Webhooks:");
     const combinedWebhookChanges = [...stateChanges.webhooks.changed, ...stateChanges.webhooks.unchanged];
     if (combinedWebhookChanges.length > 0) {

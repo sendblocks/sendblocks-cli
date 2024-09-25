@@ -3,7 +3,8 @@ import path from "path";
 import prompts from "prompts";
 import { ensureSendBlocksConfigured } from "./config";
 
-export const FUNCTION_CODE_FOLDER = "functions";
+export const SAMPLES_CODE_FOLDER = "samples";
+export const TARGET_YAML_FILE = "samples.yaml";
 export const YAML_SOURCE_FOLDER = "src";
 const CONFIG_FILE = "sendblocks.config.json";
 
@@ -54,12 +55,12 @@ export async function init(options: InitOptions = {}) {
     console.log(`Initializing project at ${projectPath} ...`);
 
     const targetEnvPath = path.resolve(projectPath, CONFIG_FILE);
-    const targetFunctionPath = path.resolve(projectPath, FUNCTION_CODE_FOLDER, "echo_function.ts");
+    const targetSamplesPath = path.resolve(projectPath, SAMPLES_CODE_FOLDER);
     const targetGitignorePath = path.resolve(projectPath, ".gitignore");
     const targetReadmePath = path.resolve(projectPath, "README.md");
-    const targetYamlPath = path.resolve(projectPath, YAML_SOURCE_FOLDER, "functions.yaml");
+    const targetYamlPath = path.resolve(projectPath, YAML_SOURCE_FOLDER, TARGET_YAML_FILE);
 
-    const targetFiles = [targetEnvPath, targetFunctionPath, targetGitignorePath, targetReadmePath, targetYamlPath];
+    const targetFiles = [targetEnvPath, targetSamplesPath, targetGitignorePath, targetReadmePath, targetYamlPath];
 
     if (fs.existsSync(projectPath)) {
         // check if any of the target files exists in the current directory
@@ -72,7 +73,7 @@ export async function init(options: InitOptions = {}) {
 
         if (filesToBeOverwritten.length > 0) {
             console.warn(
-                `\nWARNING: The following files will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`,
+                `\nWARNING: The following files or folders will be modified / overwritten:\n\t${filesToBeOverwritten.join(",\n\t")}\n`,
             );
             const confirm = await prompts({
                 type: "confirm",
@@ -88,7 +89,7 @@ export async function init(options: InitOptions = {}) {
 
     // create folder structure
     fs.mkdirSync(projectPath, { recursive: true });
-    const folders = [YAML_SOURCE_FOLDER, FUNCTION_CODE_FOLDER];
+    const folders = [YAML_SOURCE_FOLDER, SAMPLES_CODE_FOLDER];
     for (const folder of folders) {
         fs.mkdirSync(path.resolve(projectPath, folder), { recursive: true });
     }
@@ -108,9 +109,9 @@ export async function init(options: InitOptions = {}) {
     const sourceYamlPath = path.resolve(__dirname, "../public/EXAMPLE_YAML.yaml");
     fs.copyFileSync(sourceYamlPath, targetYamlPath);
 
-    // copy example function code to project folder
-    const sourceFunctionPath = path.resolve(__dirname, "../public/echo_function.ts");
-    fs.copyFileSync(sourceFunctionPath, targetFunctionPath);
+    // copy code samples to project folder
+    const sourceSamplesPath = path.resolve(__dirname, `../public/${SAMPLES_CODE_FOLDER}`);
+    fs.cpSync(sourceSamplesPath, targetSamplesPath, { recursive: true });
 
     // copy PROJECT_README.md to project project
     const sourceReadmePath = path.resolve(__dirname, "../public/PROJECT_README.md");

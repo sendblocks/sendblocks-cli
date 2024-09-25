@@ -1,19 +1,19 @@
 ---
 
 webhooks:
-  - webhook_name:
-      url: https://example.com
+  - echo_function_webhook:
+      url: https://your.webhook.url.here
       secret: "auth secret"
 
 functions:
-  - function_name:
+  - echo_function:
       chain_id: CHAIN_ETH_SEPOLIA
-      code: functions/echo_function.ts
+      code: samples/echo/echo_function.ts
       is_enabled: true
       should_send_std_streams: true
       triggers:
         - type: TRIGGER_TYPE_ADDRESS
           address: "0x1234567890abcdef1234567890abcdef12345678"
           locations:
-            - log_emitter
-      webhook: webhook_name
+            - trace_from
+      webhook: echo_function_webhook

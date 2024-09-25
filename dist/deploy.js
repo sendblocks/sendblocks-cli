@@ -40,6 +40,7 @@ const prompts_1 = __importDefault(require("prompts"));
 const functions = __importStar(require("./functions"));
 const sb_yaml_1 = require("./sb-yaml");
 const state_diff_1 = require("./state-diff");
+const subgraphs = __importStar(require("./subgraphs"));
 const webhooks = __importStar(require("./webhooks"));
 function deploy() {
     return __awaiter(this, arguments, void 0, function* ({ dryRun, nonInteractive, previewOnly, } = {}) {
@@ -51,11 +52,13 @@ function deploy() {
             return;
         }
         if (dryRun) {
-            console.log("Dry-run complete! No resources were destroyed.");
+            console.log("Dry-run complete! No changes were deployed.");
             return;
         }
-        if (stateChanges.webhooks.added.length === 0 &&
+        if (stateChanges.subgraphs.added.length === 0 &&
+            stateChanges.webhooks.added.length === 0 &&
             stateChanges.functions.added.length === 0 &&
+            stateChanges.subgraphs.changed.length === 0 &&
             stateChanges.webhooks.changed.length === 0 &&
             stateChanges.functions.changed.length === 0) {
             console.log("No changes to deploy");
@@ -73,9 +76,12 @@ function deploy() {
         if (nonInteractive || (confirm === null || confirm === void 0 ? void 0 : confirm.value)) {
             // deploy the changes
             console.log("Deploying changes...\n");
+            const subgraphResults = yield subgraphs.deploy(stateChanges.subgraphs);
             const webhookResults = yield webhooks.deploy(stateChanges.webhooks);
             const functionResults = yield functions.deploy(stateChanges.functions, webhookResults);
             console.log("\nDeployment complete!");
+            console.log("\nSubgraph deployment results:");
+            console.table(subgraphResults, ["schema_name", "deployed", "skipped", "response"]);
             console.log("\nWebhook deployment results:");
             console.table(webhookResults, ["webhook_name", "webhook_id", "deployed", "skipped", "response"]);
             console.log("Function deployment results:");
@@ -86,6 +92,23 @@ function deploy() {
 exports.deploy = deploy;
 function printStateChanges(stateChanges) {
     // print a table showing the differences between the states
+    console.log("Subgraphs:");
+    if (stateChanges.subgraphs.added.length > 0) {
+        console.log(" - To be created:");
+        console.table(stateChanges.subgraphs.added, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.changed.length > 0) {
+        console.log(" - Changed:");
+        console.table(stateChanges.subgraphs.changed, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.unchanged.length > 0) {
+        console.log(" - Unchanged:");
+        console.table(stateChanges.subgraphs.unchanged, ["schema_name"]);
+    }
+    if (stateChanges.subgraphs.unreferenced.length > 0) {
+        console.log(" - Unreferenced:");
+        console.table(stateChanges.subgraphs.unreferenced, ["schema_name"]);
+    }
     console.log("Webhooks:");
     if (stateChanges.webhooks.added.length > 0) {
         console.log(" - To be created:");
