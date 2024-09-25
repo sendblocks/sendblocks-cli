@@ -71,10 +71,11 @@ function generateStateChanges(spec) {
             webhooks: newResourceStateChanges(),
             functions: newResourceStateChanges(),
         };
-        // subgraphs
+        // subgraphs)
+        const specIncludesSubgraphs = Object.keys(spec.subgraphs).length > 0;
         let sendblocksSubgraphs;
         try {
-            sendblocksSubgraphs = yield subgraphs.getSubgraphDictionary();
+            sendblocksSubgraphs = yield subgraphs.getSubgraphDictionary({ warnOnAccessDenied: specIncludesSubgraphs });
         }
         catch (error) {
             throw new Error(`Error occurred while fetching subgraphs: ${error}`);
@@ -111,7 +112,7 @@ function generateStateChanges(spec) {
         }
         for (const schema_name in sendblocksSubgraphs) {
             if (!Object.keys(spec.subgraphs).includes(schema_name)) {
-                result.webhooks.unreferenced.push({
+                result.subgraphs.unreferenced.push({
                     schema_name: schema_name,
                 });
             }

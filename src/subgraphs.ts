@@ -18,15 +18,29 @@ export function isSubgraphChanged(name: string, sendblocksSubgraph: any, specSub
     return sendblocksSubgraph.schema !== specSubgraph.schema;
 }
 
-export async function listSubgraphSchemas() {
+export async function listSubgraphSchemas({ warnOnAccessDenied = false }: { warnOnAccessDenied?: boolean } = {}) {
     const api = await generateSubgraphsApi();
     const subgraphs = [];
     let page = 1;
     let response: ApiResponse;
-    do {
-        response = await api.listSubgraphSchemas({ page: page++ });
-        subgraphs.push(...response.data.items);
-    } while (response.data.page < response.data.pages);
+    try {
+        do {
+            response = await api.listSubgraphSchemas({ page: page++ });
+            subgraphs.push(...response.data.items);
+        } while (response.data.page < response.data.pages);
+    } catch (error: any) {
+        switch (error.status) {
+            case 403:
+                if (warnOnAccessDenied) {
+                    console.warn(
+                        `Access to subgraphs is forbidden. If you wish to deploy subgraphs, please request the necessary permissions for your API key.`,
+                    );
+                }
+                return [];
+            default:
+                throw new Error(`Error occurred while listing subgraph schemas: ${error.status} ${error.statusText}`);
+        }
+    }
     return subgraphs;
 }
 
@@ -40,9 +54,9 @@ export async function getSubgraphSchema(schema_name: string) {
     }
 }
 
-export async function getSubgraphDictionary() {
+export async function getSubgraphDictionary({ warnOnAccessDenied = false }: { warnOnAccessDenied?: boolean } = {}) {
     const returnObject: { [name: string]: any } = {};
-    const subgraphsList = await listSubgraphSchemas();
+    const subgraphsList = await listSubgraphSchemas({ warnOnAccessDenied });
     if (subgraphsList) {
         for (const schemaName of subgraphsList) {
             const schema = await getSubgraphSchema(schemaName);
@@ -52,9 +66,12 @@ export async function getSubgraphDictionary() {
     return returnObject;
 }
 
-export async function deleteSubgraphSchema(schema_name: string) {
+export async function deleteSubgraphSchema(
+    schema_name: string,
+    { warnOnAccessDenied = false }: { warnOnAccessDenied?: boolean } = {},
+) {
     const api = await generateSubgraphsApi();
-    const subgraphs = await getSubgraphDictionary();
+    const subgraphs = await getSubgraphDictionary({ warnOnAccessDenied });
     const sendblocksSubgraphSchema = subgraphs[schema_name];
     if (!sendblocksSubgraphSchema) {
         throw new Error(`Subgraph ${schema_name} not found`);

@@ -191,8 +191,9 @@ subgraphsCommand
     .action(async () => {
         try {
             console.log("Listing subgraph schemas...");
-            console.log(await subgraphs.listSubgraphSchemas());
+            console.log(await subgraphs.listSubgraphSchemas({ warnOnAccessDenied: true }));
         } catch (error: any) {
+            console.log(`index error`, error);
             console.error(error.message);
             process.exit(1);
         }

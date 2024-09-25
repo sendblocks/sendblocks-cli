@@ -223,9 +223,10 @@ subgraphsCommand
     .action(() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("Listing subgraph schemas...");
-        console.log(yield subgraphs.listSubgraphSchemas());
+        console.log(yield subgraphs.listSubgraphSchemas({ warnOnAccessDenied: true }));
     }
     catch (error) {
+        console.log(`index error`, error);
         console.error(error.message);
         process.exit(1);
     }
