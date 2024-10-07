@@ -2,7 +2,8 @@
 
 import { Command } from "commander";
 import { bin, description, version } from "../package.json";
-import { login } from "./auth";
+import { login, refreshToken } from "./auth";
+import * as contracts from "./contracts";
 import { convertHexOrDecimal } from "./convert";
 import { deploy } from "./deploy";
 import { destroy } from "./destroy";
@@ -11,6 +12,14 @@ import { generateCode } from "./graphql/codegen";
 import { getSetEnvironment, init } from "./project";
 import * as subgraphs from "./subgraphs";
 import * as webhooks from "./webhooks";
+
+function parseError(error: any) {
+    let errorMessage = error.message;
+    if (error.data?.detail) {
+        errorMessage += `: ${error.data.detail}`;
+    }
+    return errorMessage;
+}
 
 const program = new Command();
 
@@ -27,13 +36,13 @@ program.name(cliCommandNames[0]).version(version).description(description);
 
 program
     .command("env", { hidden: true })
-    .description("Get or set the current environment variables.")
-    .argument("[env]", `Reset corrupted .env variables with "default", or leave empty to show current configuration.`)
+    .description("Get or reset the current environment variables.")
+    .argument("[env]", `Reset corrupted .env variables with "reset", or leave empty to show current configuration.`)
     .action(async (env: string) => {
         try {
             await getSetEnvironment(env);
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -41,11 +50,16 @@ program
 program
     .command("login")
     .description("Login with API credentials to retrieve a valid JWT token.")
-    .action(async () => {
+    .option("--refresh", "Refresh the JWT token instead of logging in")
+    .action(async (options) => {
         try {
-            await login();
+            if (options.refresh) {
+                await refreshToken();
+            } else {
+                await login();
+            }
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -58,7 +72,7 @@ program
         try {
             await init({ path });
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -70,7 +84,7 @@ program
         try {
             await deploy({ previewOnly: true });
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -83,7 +97,7 @@ program
         try {
             await deploy(options);
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -102,6 +116,53 @@ program
         }
     });
 
+const contractsCommand = program.command("contracts");
+contractsCommand
+    .command("analyze")
+    .description("Analyze or get information about a contract.")
+    .argument("<chain_id>", "Chain ID")
+    .argument("<contract_address>", "Contract address")
+    .action(async (chainId, contractAddress, options) => {
+        try {
+            console.log("Analyzing contract...");
+            await contracts.analyzeContract(chainId, contractAddress);
+        } catch (error: any) {
+            console.error(parseError(error));
+            process.exit(1);
+        }
+    });
+
+contractsCommand
+    .command("analysis")
+    .description("Get the result of a contract analysis.")
+    .argument("<chain_id>", "Chain ID")
+    .argument("<contract_address>", "Contract address")
+    .option("--follow-proxy", "Follow the proxy contract address (default)")
+    .option("--no-follow-proxy", "Do not follow the proxy contract address")
+    .action(async (chainId, contractAddress, options) => {
+        try {
+            console.log("Getting contract...");
+            console.log(await contracts.getAnalyzedContract(chainId, contractAddress, options.followProxy));
+        } catch (error: any) {
+            console.error(parseError(error));
+            process.exit(1);
+        }
+    });
+
+contractsCommand
+    .command("abi")
+    .description("Get the ABI of a contract.")
+    .argument("<chain_id>", "Chain ID")
+    .argument("<contract_address>", "Contract address")
+    .action(async (chainId, contractAddress) => {
+        try {
+            console.log(await contracts.getContractAbi(chainId, contractAddress));
+        } catch (error: any) {
+            console.error(parseError(error));
+            process.exit(1);
+        }
+    });
+
 const functionsCommand = program.command("functions");
 functionsCommand
     .command("list")
@@ -109,9 +170,9 @@ functionsCommand
     .action(async () => {
         try {
             console.log("Listing functions...");
-            console.log(await functions.listFunctions());
+            functions.prettyPrint(await functions.listFunctions());
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -124,7 +185,7 @@ functionsCommand
             console.log("Deleting function...");
             console.log(await functions.deleteFunction(name));
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -152,34 +213,7 @@ functionsCommand
             console.log(`Replaying blocks ${options.start} through ${options.end} for ${functionsText}...`);
             await functions.replayBlocks(functionNames, options.start, options.end);
         } catch (error: any) {
-            console.error(error.message);
-            process.exit(1);
-        }
-    });
-
-const webhooksCommand = program.command("webhooks");
-webhooksCommand
-    .command("list")
-    .description("List all webhooks.")
-    .action(async () => {
-        try {
-            console.log("Listing webhooks...");
-            console.log(await webhooks.listWebhooks());
-        } catch (error: any) {
-            console.error(error.message);
-            process.exit(1);
-        }
-    });
-webhooksCommand
-    .command("delete")
-    .description("Delete a webhook.")
-    .argument("<name>", "Name of the webhook")
-    .action(async (name) => {
-        try {
-            console.log("Deleting webhook...");
-            console.log(await webhooks.deleteWebhook(name));
-        } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -193,8 +227,7 @@ subgraphsCommand
             console.log("Listing subgraph schemas...");
             console.log(await subgraphs.listSubgraphSchemas({ warnOnAccessDenied: true }));
         } catch (error: any) {
-            console.log(`index error`, error);
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -207,7 +240,7 @@ subgraphsCommand
             console.log("Deleting subgraph schema...");
             console.log(await subgraphs.deleteSubgraphSchema(name));
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -220,7 +253,34 @@ subgraphsCommand
         try {
             console.log(await generateCode(options));
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
+            process.exit(1);
+        }
+    });
+
+const webhooksCommand = program.command("webhooks");
+webhooksCommand
+    .command("list")
+    .description("List all webhooks.")
+    .action(async () => {
+        try {
+            console.log("Listing webhooks...");
+            console.log(await webhooks.listWebhooks());
+        } catch (error: any) {
+            console.error(parseError(error));
+            process.exit(1);
+        }
+    });
+webhooksCommand
+    .command("delete")
+    .description("Delete a webhook.")
+    .argument("<name>", "Name of the webhook")
+    .action(async (name) => {
+        try {
+            console.log("Deleting webhook...");
+            console.log(await webhooks.deleteWebhook(name));
+        } catch (error: any) {
+            console.error(parseError(error));
             process.exit(1);
         }
     });
@@ -233,7 +293,7 @@ program
         try {
             console.log(convertHexOrDecimal(val));
         } catch (error: any) {
-            console.error(error.message);
+            console.error(parseError(error));
             process.exit(1);
         }
     });

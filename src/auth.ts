@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import prompts from "prompts";
-import { authUrl, ensureSendBlocksConfigured } from "./config";
+import { authUrl, ensureSendBlocksConfigured, refreshUrl } from "./config";
 
 export async function loadToken() {
     // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
@@ -21,8 +21,8 @@ export async function loadToken() {
 export async function login(): Promise<string> {
     ensureSendBlocksConfigured();
 
-    if (authUrl.length === 0) {
-        console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
+    if (!authUrl || authUrl.length === 0) {
+        console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
         process.exit(1);
     }
 
@@ -53,7 +53,7 @@ export async function login(): Promise<string> {
         // ignore error
     }
 
-    const response = await fetch(authUrl, {
+    const response: Response = await fetch(authUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -63,13 +63,56 @@ export async function login(): Promise<string> {
             secret: secret.value,
         }),
     });
+
     if (!response.ok) {
         throw new Error(`Failed to login, received status code ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
-    let token = data.accessToken;
-    await fs.promises.writeFile(".auth", token);
+    await fs.promises.writeFile(".auth", data.accessToken);
+    await fs.promises.writeFile(".refresh", data.refreshToken);
     console.log("Successfully logged in! Bearer token stored in .auth file.");
-    console.log(`Bearer token: ${token}\n\n`);
-    return token;
+    console.log(`Bearer token: ${data.accessToken}\n\n`);
+    return data.accessToken;
+}
+
+export async function refreshToken(): Promise<string> {
+    ensureSendBlocksConfigured();
+
+    if (!refreshUrl || refreshUrl.length === 0) {
+        console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
+        process.exit(1);
+    }
+
+    let authToken: string;
+    let refreshToken: string;
+    try {
+        authToken = await fs.promises.readFile(".auth", "utf-8");
+        refreshToken = await fs.promises.readFile(".refresh", "utf-8");
+    } catch (error) {
+        console.error("Failed to read existing token files, please authenticate with `sb-cli login`.");
+        process.exit(1);
+    }
+
+    const response: Response = await fetch(refreshUrl, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            refreshToken: refreshToken,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to refresh token: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    await fs.promises.writeFile(".auth", data.access_token);
+    await fs.promises.writeFile(".refresh", data.refresh_token);
+
+    console.log("Successfully refreshed token! Bearer token stored in .auth file.");
+    console.log(`Bearer token: ${data.access_token}\n\n`);
+    return data.access_token;
 }

@@ -23,11 +23,11 @@ export async function getSetEnvironment(
     if (env) {
         try {
             if (!options.quiet) {
-                console.log("Setting configuration for", env);
+                console.log(env == "reset" ? "Resetting configuration..." : `Setting configuration (${env})...`);
             }
             // copy the config file for the target environment
             const sourcePath =
-                env == "default"
+                env == "reset"
                     ? path.resolve(__dirname, `../${CONFIG_FILE}`)
                     : path.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
             const targetPath = path.resolve(projectPath, CONFIG_FILE);

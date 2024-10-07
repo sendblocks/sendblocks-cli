@@ -1,4 +1,5 @@
 {
     "authUrl": "https://auth.sendblocks.io/identity/resources/auth/v1/api-token",
+    "refreshUrl": "https://auth.sendblocks.io/identity/resources/auth/v2/api-token/token/refresh",
     "apiUrl": "https://api.sendblocks.io"
 }

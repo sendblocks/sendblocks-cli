@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.loadToken = void 0;
+exports.refreshToken = exports.login = exports.loadToken = void 0;
 const fs_1 = __importDefault(require("fs"));
 const prompts_1 = __importDefault(require("prompts"));
 const config_1 = require("./config");
@@ -37,8 +37,8 @@ exports.loadToken = loadToken;
 function login() {
     return __awaiter(this, void 0, void 0, function* () {
         (0, config_1.ensureSendBlocksConfigured)();
-        if (config_1.authUrl.length === 0) {
-            console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
+        if (!config_1.authUrl || config_1.authUrl.length === 0) {
+            console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
             process.exit(1);
         }
         const clientId = yield (0, prompts_1.default)({
@@ -78,12 +78,51 @@ function login() {
             throw new Error(`Failed to login, received status code ${response.status} ${response.statusText}`);
         }
         const data = yield response.json();
-        let token = data.accessToken;
-        yield fs_1.default.promises.writeFile(".auth", token);
+        yield fs_1.default.promises.writeFile(".auth", data.accessToken);
+        yield fs_1.default.promises.writeFile(".refresh", data.refreshToken);
         console.log("Successfully logged in! Bearer token stored in .auth file.");
-        console.log(`Bearer token: ${token}\n\n`);
-        return token;
+        console.log(`Bearer token: ${data.accessToken}\n\n`);
+        return data.accessToken;
     });
 }
 exports.login = login;
+function refreshToken() {
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, config_1.ensureSendBlocksConfigured)();
+        if (!config_1.refreshUrl || config_1.refreshUrl.length === 0) {
+            console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
+            process.exit(1);
+        }
+        let authToken;
+        let refreshToken;
+        try {
+            authToken = yield fs_1.default.promises.readFile(".auth", "utf-8");
+            refreshToken = yield fs_1.default.promises.readFile(".refresh", "utf-8");
+        }
+        catch (error) {
+            console.error("Failed to read existing token files, please authenticate with `sb-cli login`.");
+            process.exit(1);
+        }
+        const response = yield fetch(config_1.refreshUrl, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                refreshToken: refreshToken,
+            }),
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to refresh token: ${response.status} ${response.statusText}`);
+        }
+        const data = yield response.json();
+        yield fs_1.default.promises.writeFile(".auth", data.access_token);
+        yield fs_1.default.promises.writeFile(".refresh", data.refresh_token);
+        console.log("Successfully refreshed token! Bearer token stored in .auth file.");
+        console.log(`Bearer token: ${data.access_token}\n\n`);
+        return data.access_token;
+    });
+}
+exports.refreshToken = refreshToken;
 //# sourceMappingURL=auth.js.map

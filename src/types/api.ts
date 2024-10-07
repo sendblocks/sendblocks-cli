@@ -5,11 +5,17 @@
 
 
 export interface paths {
-  "/api/v1/contracts": {
-    /** Get Analyzed Contract */
-    get: operations["get_analyzed_contract_api_v1_contracts_get"];
+  "/api/v1/contracts/{chain_id}/analyze": {
     /** Analyze Contract */
-    post: operations["analyze_contract_api_v1_contracts_post"];
+    post: operations["analyze_contract_api_v1_contracts__chain_id__analyze_post"];
+  };
+  "/api/v1/contracts/{chain_id}/{contract_address}/analysis": {
+    /** Get Analyzed Contract */
+    get: operations["get_analyzed_contract_api_v1_contracts__chain_id___contract_address__analysis_get"];
+  };
+  "/api/v1/contracts/{chain_id}/{contract_address}/abi": {
+    /** Get Contract Abi */
+    get: operations["get_contract_abi_api_v1_contracts__chain_id___contract_address__abi_get"];
   };
   "/api/v1/events": {
     /** Get Events */
@@ -60,9 +66,9 @@ export interface paths {
     /** Run Playground */
     post: operations["run_playground_api_v1_playground_run_post"];
   };
-  "/api/v1/samples/{chain_id}-{trigger_type}": {
+  "/api/v1/samples/{file_name}": {
     /** Get Default Sample */
-    get: operations["get_default_sample_api_v1_samples__chain_id___trigger_type__get"];
+    get: operations["get_default_sample_api_v1_samples__file_name__get"];
   };
   "/api/v1/samples": {
     /** Get Sample */
@@ -210,16 +216,14 @@ export interface components {
         [key: string]: string;
       };
     };
+    /**
+     * ChainNameEnum
+     * @description An enumeration of supported blockchain networks.
+     * @enum {unknown}
+     */
+    ChainNameEnum: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
     /** ContractRequest */
     ContractRequest: {
-      /**
-       * Chain
-       * @description Chain for the function to run on
-       * @default CHAIN_ETH_MAINNET
-       * @example CHAIN_ETH_MAINNET
-       * @enum {string}
-       */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_POLYGON_MAINNET";
       /**
        * Contract Address
        * @description EVM address of the contract
@@ -403,7 +407,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * Trigger
        * @description Trigger that will invoke the function
@@ -461,6 +465,12 @@ export interface components {
        * @enum {string}
        */
       type: "TRIGGER_TYPE_NEW_CONTRACT";
+      /**
+       * Deployer Address
+       * @description Address of the new contract deployer
+       * @example 0x283af0b28c62c092c9727f1ee09c02ca627eb7f5
+       */
+      deployer_address?: string;
       /**
        * Custom parameters
        * @description Parameters to be passed to the function when it is triggered by this trigger
@@ -634,7 +644,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * StartBlockNumber
        * @description The first block number that will be replayed
@@ -675,7 +685,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * Triggers
        * @description Triggers that will invoke the function
@@ -983,24 +993,51 @@ export type external = Record<string, never>;
 
 export interface operations {
 
-  /** Get Analyzed Contract */
-  get_analyzed_contract_api_v1_contracts_get: {
+  /** Analyze Contract */
+  analyze_contract_api_v1_contracts__chain_id__analyze_post: {
     parameters: {
-      query: {
-        /**
-         * @description Chain for the function to run on
-         * @example CHAIN_ETH_MAINNET
-         */
-        chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_POLYGON_MAINNET";
-        /**
-         * @description EVM address of the contract
-         * @example 0x283af0b28c62c092c9727f1ee09c02ca627eb7f5
-         */
-        contract_address: string;
+      path: {
+        chain_id: components["schemas"]["ChainNameEnum"];
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContractRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Bad Request */
+      400: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Get Analyzed Contract */
+  get_analyzed_contract_api_v1_contracts__chain_id___contract_address__analysis_get: {
+    parameters: {
+      query?: {
         /** @description Should we fetch the analyzed implementation contract */
         follow_proxy?: boolean;
         page?: number;
         size?: number;
+      };
+      path: {
+        chain_id: components["schemas"]["ChainNameEnum"];
+        contract_address: string;
       };
     };
     responses: {
@@ -1026,17 +1063,20 @@ export interface operations {
       };
     };
   };
-  /** Analyze Contract */
-  analyze_contract_api_v1_contracts_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ContractRequest"];
+  /** Get Contract Abi */
+  get_contract_abi_api_v1_contracts__chain_id___contract_address__abi_get: {
+    parameters: {
+      path: {
+        chain_id: components["schemas"]["ChainNameEnum"];
+        contract_address: string;
       };
     };
     responses: {
       /** @description Successful Response */
-      204: {
-        content: never;
+      200: {
+        content: {
+          "application/json": string;
+        };
       };
       /** @description Bad Request */
       400: {
@@ -1464,11 +1504,10 @@ export interface operations {
     };
   };
   /** Get Default Sample */
-  get_default_sample_api_v1_samples__chain_id___trigger_type__get: {
+  get_default_sample_api_v1_samples__file_name__get: {
     parameters: {
       path: {
-        chain_id: string;
-        trigger_type: string;
+        file_name: string;
       };
     };
     responses: {

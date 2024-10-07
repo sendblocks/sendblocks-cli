@@ -28,10 +28,10 @@ function getSetEnvironment(env_1) {
         if (env) {
             try {
                 if (!options.quiet) {
-                    console.log("Setting configuration for", env);
+                    console.log(env == "reset" ? "Resetting configuration..." : `Setting configuration (${env})...`);
                 }
                 // copy the config file for the target environment
-                const sourcePath = env == "default"
+                const sourcePath = env == "reset"
                     ? path_1.default.resolve(__dirname, `../${CONFIG_FILE}`)
                     : path_1.default.resolve(__dirname, `../${CONFIG_FILE}.${env}`);
                 const targetPath = path_1.default.resolve(projectPath, CONFIG_FILE);

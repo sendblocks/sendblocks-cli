@@ -5,8 +5,8 @@ import { apiUrl } from "./config";
 import { paths } from "./types/api";
 
 export async function generateFetcher() {
-    if (apiUrl.length === 0) {
-        console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
+    if (!apiUrl || apiUrl.length === 0) {
+        console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
         process.exit(1);
     }
     const token = await loadToken();

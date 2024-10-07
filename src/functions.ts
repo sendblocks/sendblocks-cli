@@ -1,4 +1,5 @@
 import { ApiResponse } from "openapi-typescript-fetch";
+import { colorize, color } from "json-colorizer";
 import { forceHexOrDecimalToDecimal } from "./convert";
 import { generateFetcher } from "./fetcher";
 import { areFunctionTriggersChanged } from "./function-triggers";
@@ -287,4 +288,24 @@ export async function destroy(stateChanges: ResourceStateChanges) {
     }
 
     return results;
+}
+
+export function prettyPrint(functions: any[]) {
+    console.log(
+        colorize(functions, {
+            indent: 2,
+            colors: {
+                StringKey: color.white,
+                BooleanLiteral: color.yellow,
+                NullLiteral: color.red,
+                StringLiteral: color.green,
+                NumberLiteral: color.blue,
+                Whitespace: color.gray,
+                Brace: color.white,
+                Bracket: color.white,
+                Colon: color.white,
+                Comma: color.white,
+            },
+        }),
+    );
 }

@@ -15,8 +15,8 @@ const auth_1 = require("./auth");
 const config_1 = require("./config");
 function generateFetcher() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (config_1.apiUrl.length === 0) {
-            console.error("Project environment has been corrupted, run 'sb-cli init' to reset.");
+        if (!config_1.apiUrl || config_1.apiUrl.length === 0) {
+            console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
             process.exit(1);
         }
         const token = yield (0, auth_1.loadToken)();

@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const package_json_1 = require("../package.json");
 const auth_1 = require("./auth");
+const contracts = __importStar(require("./contracts"));
 const convert_1 = require("./convert");
 const deploy_1 = require("./deploy");
 const destroy_1 = require("./destroy");
@@ -44,6 +45,14 @@ const codegen_1 = require("./graphql/codegen");
 const project_1 = require("./project");
 const subgraphs = __importStar(require("./subgraphs"));
 const webhooks = __importStar(require("./webhooks"));
+function parseError(error) {
+    var _a;
+    let errorMessage = error.message;
+    if ((_a = error.data) === null || _a === void 0 ? void 0 : _a.detail) {
+        errorMessage += `: ${error.data.detail}`;
+    }
+    return errorMessage;
+}
 const program = new commander_1.Command();
 const cliCommandNames = Object.keys(package_json_1.bin);
 if (cliCommandNames.length !== 1) {
@@ -56,26 +65,32 @@ if (cliCommandNames.length !== 1) {
 program.name(cliCommandNames[0]).version(package_json_1.version).description(package_json_1.description);
 program
     .command("env", { hidden: true })
-    .description("Get or set the current environment variables.")
-    .argument("[env]", `Reset corrupted .env variables with "default", or leave empty to show current configuration.`)
+    .description("Get or reset the current environment variables.")
+    .argument("[env]", `Reset corrupted .env variables with "reset", or leave empty to show current configuration.`)
     .action((env) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, project_1.getSetEnvironment)(env);
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
 program
     .command("login")
     .description("Login with API credentials to retrieve a valid JWT token.")
-    .action(() => __awaiter(void 0, void 0, void 0, function* () {
+    .option("--refresh", "Refresh the JWT token instead of logging in")
+    .action((options) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, auth_1.login)();
+        if (options.refresh) {
+            yield (0, auth_1.refreshToken)();
+        }
+        else {
+            yield (0, auth_1.login)();
+        }
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -88,7 +103,7 @@ program
         yield (0, project_1.init)({ path });
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -100,7 +115,7 @@ program
         yield (0, deploy_1.deploy)({ previewOnly: true });
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -114,7 +129,7 @@ program
         yield (0, deploy_1.deploy)(options);
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -132,6 +147,53 @@ program
         process.exit(1);
     }
 }));
+const contractsCommand = program.command("contracts");
+contractsCommand
+    .command("analyze")
+    .description("Analyze or get information about a contract.")
+    .argument("<chain_id>", "Chain ID")
+    .argument("<contract_address>", "Contract address")
+    .action((chainId, contractAddress, options) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Analyzing contract...");
+        yield contracts.analyzeContract(chainId, contractAddress);
+    }
+    catch (error) {
+        console.error(parseError(error));
+        process.exit(1);
+    }
+}));
+contractsCommand
+    .command("analysis")
+    .description("Get the result of a contract analysis.")
+    .argument("<chain_id>", "Chain ID")
+    .argument("<contract_address>", "Contract address")
+    .option("--follow-proxy", "Follow the proxy contract address (default)")
+    .option("--no-follow-proxy", "Do not follow the proxy contract address")
+    .action((chainId, contractAddress, options) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Getting contract...");
+        console.log(yield contracts.getAnalyzedContract(chainId, contractAddress, options.followProxy));
+    }
+    catch (error) {
+        console.error(parseError(error));
+        process.exit(1);
+    }
+}));
+contractsCommand
+    .command("abi")
+    .description("Get the ABI of a contract.")
+    .argument("<chain_id>", "Chain ID")
+    .argument("<contract_address>", "Contract address")
+    .action((chainId, contractAddress) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(yield contracts.getContractAbi(chainId, contractAddress));
+    }
+    catch (error) {
+        console.error(parseError(error));
+        process.exit(1);
+    }
+}));
 const functionsCommand = program.command("functions");
 functionsCommand
     .command("list")
@@ -139,10 +201,10 @@ functionsCommand
     .action(() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("Listing functions...");
-        console.log(yield functions.listFunctions());
+        functions.prettyPrint(yield functions.listFunctions());
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -156,7 +218,7 @@ functionsCommand
         console.log(yield functions.deleteFunction(name));
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -184,35 +246,7 @@ functionsCommand
         yield functions.replayBlocks(functionNames, options.start, options.end);
     }
     catch (error) {
-        console.error(error.message);
-        process.exit(1);
-    }
-}));
-const webhooksCommand = program.command("webhooks");
-webhooksCommand
-    .command("list")
-    .description("List all webhooks.")
-    .action(() => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log("Listing webhooks...");
-        console.log(yield webhooks.listWebhooks());
-    }
-    catch (error) {
-        console.error(error.message);
-        process.exit(1);
-    }
-}));
-webhooksCommand
-    .command("delete")
-    .description("Delete a webhook.")
-    .argument("<name>", "Name of the webhook")
-    .action((name) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log("Deleting webhook...");
-        console.log(yield webhooks.deleteWebhook(name));
-    }
-    catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -226,8 +260,7 @@ subgraphsCommand
         console.log(yield subgraphs.listSubgraphSchemas({ warnOnAccessDenied: true }));
     }
     catch (error) {
-        console.log(`index error`, error);
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -241,7 +274,7 @@ subgraphsCommand
         console.log(yield subgraphs.deleteSubgraphSchema(name));
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -255,7 +288,35 @@ subgraphsCommand
         console.log(yield (0, codegen_1.generateCode)(options));
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
+        process.exit(1);
+    }
+}));
+const webhooksCommand = program.command("webhooks");
+webhooksCommand
+    .command("list")
+    .description("List all webhooks.")
+    .action(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Listing webhooks...");
+        console.log(yield webhooks.listWebhooks());
+    }
+    catch (error) {
+        console.error(parseError(error));
+        process.exit(1);
+    }
+}));
+webhooksCommand
+    .command("delete")
+    .description("Delete a webhook.")
+    .argument("<name>", "Name of the webhook")
+    .action((name) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Deleting webhook...");
+        console.log(yield webhooks.deleteWebhook(name));
+    }
+    catch (error) {
+        console.error(parseError(error));
         process.exit(1);
     }
 }));
@@ -268,7 +329,7 @@ program
         console.log((0, convert_1.convertHexOrDecimal)(val));
     }
     catch (error) {
-        console.error(error.message);
+        console.error(parseError(error));
         process.exit(1);
     }
 });

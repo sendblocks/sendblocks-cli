@@ -59,6 +59,15 @@ function isEventTriggerTypeChanged(
     return false;
 }
 
+function isContractTriggerTypeChanged(
+    sendblocksFunctionTrigger: components["schemas"]["NewContractTriggerData"],
+    specFunctionTrigger: components["schemas"]["NewContractTriggerData"],
+): boolean {
+    return (
+        sendblocksFunctionTrigger.deployer_address?.toLowerCase() != specFunctionTrigger.deployer_address?.toLowerCase()
+    );
+}
+
 function isFunctionTriggerTypeChanged(
     sendblocksFunctionTrigger: components["schemas"]["FunctionTriggerData"],
     specFunctionTrigger: components["schemas"]["FunctionTriggerData"],
@@ -184,7 +193,10 @@ export function isFunctionTriggerChanged(
         case "TRIGGER_TYPE_NEW_BLOCK":
             break;
         case "TRIGGER_TYPE_NEW_CONTRACT":
-            break;
+            if (specFunctionTrigger.type != "TRIGGER_TYPE_NEW_CONTRACT") {
+                throw new Error("Trigger type mismatch.");
+            }
+            return isContractTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
         case "TRIGGER_TYPE_STORAGE_ACCESS":
             if (specFunctionTrigger.type != "TRIGGER_TYPE_STORAGE_ACCESS") {
                 throw new Error("Trigger type mismatch.");

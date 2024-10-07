@@ -9,7 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.deploy = exports.replayBlocks = exports.listFunctions = exports.isFunctionChanged = exports.isFunctionCodeChanged = exports.getFunctionCode = exports.getFunctionDictionary = exports.deleteFunction = void 0;
+exports.prettyPrint = exports.destroy = exports.deploy = exports.replayBlocks = exports.listFunctions = exports.isFunctionChanged = exports.isFunctionCodeChanged = exports.getFunctionCode = exports.getFunctionDictionary = exports.deleteFunction = void 0;
+const json_colorizer_1 = require("json-colorizer");
 const convert_1 = require("./convert");
 const fetcher_1 = require("./fetcher");
 const function_triggers_1 = require("./function-triggers");
@@ -313,4 +314,22 @@ function destroy(stateChanges) {
     });
 }
 exports.destroy = destroy;
+function prettyPrint(functions) {
+    console.log((0, json_colorizer_1.colorize)(functions, {
+        indent: 2,
+        colors: {
+            StringKey: json_colorizer_1.color.white,
+            BooleanLiteral: json_colorizer_1.color.yellow,
+            NullLiteral: json_colorizer_1.color.red,
+            StringLiteral: json_colorizer_1.color.green,
+            NumberLiteral: json_colorizer_1.color.blue,
+            Whitespace: json_colorizer_1.color.gray,
+            Brace: json_colorizer_1.color.white,
+            Bracket: json_colorizer_1.color.white,
+            Colon: json_colorizer_1.color.white,
+            Comma: json_colorizer_1.color.white,
+        },
+    }));
+}
+exports.prettyPrint = prettyPrint;
 //# sourceMappingURL=functions.js.map

@@ -59,10 +59,11 @@ $ sb-cli login
 ✔ Enter your SendBlocks Secret … ************************************
 Successfully logged in! Bearer token stored in .auth file.
 Bearer token: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFmNjQ4NmJMIn0....
-
 ```
 
-If your token has expired, simply run `sb-cli login` again.
+Once you have successfully logged in, you will be able to refresh your authentication token with `sb-cli login --refresh`.
+
+If your refresh token has expired, simply run `sb-cli login` again.
 
 ## Webhooks
 

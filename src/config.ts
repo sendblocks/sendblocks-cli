@@ -14,9 +14,11 @@ export function ensureSendBlocksConfigured(options: { projectPath?: string } = {
 
 let configurationJson: {
     authUrl: string;
+    refreshUrl: string;
     apiUrl: string;
 } = {
     authUrl: "",
+    refreshUrl: "",
     apiUrl: "",
 };
 
@@ -27,5 +29,5 @@ try {
 }
 
 export const authUrl: string = configurationJson.authUrl;
-
+export const refreshUrl: string = configurationJson.refreshUrl;
 export const apiUrl: string = configurationJson.apiUrl;

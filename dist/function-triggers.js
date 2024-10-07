@@ -50,6 +50,10 @@ function isEventTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigge
     }
     return false;
 }
+function isContractTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger) {
+    var _a, _b;
+    return (((_a = sendblocksFunctionTrigger.deployer_address) === null || _a === void 0 ? void 0 : _a.toLowerCase()) != ((_b = specFunctionTrigger.deployer_address) === null || _b === void 0 ? void 0 : _b.toLowerCase()));
+}
 function isFunctionTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger) {
     if (sendblocksFunctionTrigger.function != specFunctionTrigger.function) {
         return true;
@@ -128,7 +132,10 @@ function isFunctionTriggerChanged(sendblocksFunctionTrigger, specFunctionTrigger
         case "TRIGGER_TYPE_NEW_BLOCK":
             break;
         case "TRIGGER_TYPE_NEW_CONTRACT":
-            break;
+            if (specFunctionTrigger.type != "TRIGGER_TYPE_NEW_CONTRACT") {
+                throw new Error("Trigger type mismatch.");
+            }
+            return isContractTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
         case "TRIGGER_TYPE_STORAGE_ACCESS":
             if (specFunctionTrigger.type != "TRIGGER_TYPE_STORAGE_ACCESS") {
                 throw new Error("Trigger type mismatch.");
