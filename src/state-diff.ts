@@ -192,7 +192,7 @@ export async function generateStateChanges(spec: Spec) {
 
         if (specFunction.source) {
             // zip the source directory and encode it as base64
-            specFunction.code = await blobToBase64(await zipFolder(specFunction.source));
+            specFunction.code = await blobToBase64(await zipFolder(specFunction.source, specFunction.main));
         }
 
         const sendblocksFunction = sendblocksFunctions[specItem];

@@ -205,7 +205,7 @@ function generateStateChanges(spec) {
             }
             if (specFunction.source) {
                 // zip the source directory and encode it as base64
-                specFunction.code = yield (0, zip_tools_1.blobToBase64)(yield (0, zip_tools_1.zipFolder)(specFunction.source));
+                specFunction.code = yield (0, zip_tools_1.blobToBase64)(yield (0, zip_tools_1.zipFolder)(specFunction.source, specFunction.main));
             }
             const sendblocksFunction = sendblocksFunctions[specItem];
             if (!sendblocksFunction) {

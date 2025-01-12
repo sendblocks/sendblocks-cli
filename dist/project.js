@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = exports.getSetEnvironment = exports.YAML_SOURCE_FOLDER = exports.TARGET_YAML_FILE = exports.SAMPLES_CODE_FOLDER = void 0;
+exports.addCommands = exports.init = exports.getSetEnvironment = exports.YAML_SOURCE_FOLDER = exports.TARGET_YAML_FILE = exports.SAMPLES_CODE_FOLDER = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const prompts_1 = __importDefault(require("prompts"));
 const config_1 = require("./config");
+const utils_1 = require("./utils");
 exports.SAMPLES_CODE_FOLDER = "samples";
 exports.TARGET_YAML_FILE = "samples.yaml";
 exports.YAML_SOURCE_FOLDER = "src";
@@ -122,4 +123,33 @@ function init() {
     });
 }
 exports.init = init;
+function addCommands(program) {
+    program
+        .command("env", { hidden: true })
+        .description("Get or reset the current environment variables.")
+        .argument("[env]", `Reset corrupted .env variables with "reset", or leave empty to show current configuration.`)
+        .action((env) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield getSetEnvironment(env);
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+    program
+        .command("init")
+        .description("Initialize a new project.")
+        .argument("[path]", "Path to the project folder.")
+        .action((path) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield init({ path });
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+}
+exports.addCommands = addCommands;
 //# sourceMappingURL=project.js.map

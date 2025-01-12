@@ -1,7 +1,9 @@
 import fs from "fs";
 
+import { Command } from "commander";
 import prompts from "prompts";
 import { authUrl, ensureSendBlocksConfigured, refreshUrl } from "./config";
+import { parseError } from "./utils";
 
 export async function loadToken() {
     // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
@@ -18,7 +20,7 @@ export async function loadToken() {
     }
 }
 
-export async function login(): Promise<string> {
+export async function login(options: { clientId?: string } = {}): Promise<string> {
     ensureSendBlocksConfigured();
 
     if (!authUrl || authUrl.length === 0) {
@@ -26,25 +28,31 @@ export async function login(): Promise<string> {
         process.exit(1);
     }
 
-    const clientId = await prompts({
-        type: "text",
-        name: "value",
-        message: "Enter your SendBlocks Client ID",
-    });
+    let clientId = options.clientId;
+    if (!clientId) {
+        const clientIdInput = await prompts({
+            type: "text",
+            name: "value",
+            message: "Enter your SendBlocks Client ID",
+        });
 
-    if (!clientId.value || clientId.value.length === 0) {
-        throw new Error("Client ID is required.");
+        if (!clientIdInput.value || clientIdInput.value.length === 0) {
+            throw new Error("Client ID is required.");
+        }
+        clientId = clientIdInput.value;
     }
 
-    const secret = await prompts({
+    const secretInput = await prompts({
         type: "password",
         name: "value",
         message: "Enter your SendBlocks Secret",
     });
 
-    if (!secret.value || secret.value.length === 0) {
+    if (!secretInput.value || secretInput.value.length === 0) {
         throw new Error("Secret is required.");
     }
+
+    const secret = secretInput.value;
 
     // delete the .auth file
     try {
@@ -59,8 +67,8 @@ export async function login(): Promise<string> {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            clientId: clientId.value,
-            secret: secret.value,
+            clientId: clientId,
+            secret: secret,
         }),
     });
 
@@ -115,4 +123,24 @@ export async function refreshToken(): Promise<string> {
     console.log("Successfully refreshed token! Bearer token stored in .auth file.");
     console.log(`Bearer token: ${data.access_token}\n\n`);
     return data.access_token;
+}
+
+export function addCommands(program: Command) {
+    program
+        .command("login")
+        .description("Login with API credentials to retrieve a valid JWT token.")
+        .option("--client-id <client-id>", "Client ID (optional, will prompt if not provided)")
+        .option("--refresh", "Refresh the JWT token instead of logging in (cannot be used with --client-id)")
+        .action(async (options: { clientId: string; refresh: boolean }) => {
+            try {
+                if (options.refresh && !options.clientId) {
+                    await refreshToken();
+                } else {
+                    await login(options);
+                }
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
 }

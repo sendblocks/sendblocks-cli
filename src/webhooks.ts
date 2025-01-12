@@ -1,5 +1,7 @@
+import { Command } from "commander";
 import { ApiResponse } from "openapi-typescript-fetch";
 import { generateFetcher } from "./fetcher";
+import { parseError } from "./utils";
 
 async function generateWebhooksApi() {
     const fetcher = await generateFetcher();
@@ -135,4 +137,33 @@ export async function destroy(stateChanges: ResourceStateChanges, functionDeploy
     }
 
     return results;
+}
+
+export function addCommands(program: Command) {
+    const webhooksCommand = program.command("webhooks");
+    webhooksCommand
+        .command("list")
+        .description("List all webhooks.")
+        .action(async () => {
+            try {
+                console.log("Listing webhooks...");
+                console.log(await listWebhooks());
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
+    webhooksCommand
+        .command("delete")
+        .description("Delete a webhook.")
+        .argument("<name>", "Name of the webhook")
+        .action(async (name) => {
+            try {
+                console.log("Deleting webhook...");
+                console.log(await deleteWebhook(name));
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
 }

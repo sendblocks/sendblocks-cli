@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prettyPrint = exports.destroy = exports.deploy = exports.replayBlocks = exports.listFunctions = exports.isFunctionChanged = exports.isFunctionCodeChanged = exports.getFunctionCode = exports.getFunctionDictionary = exports.deleteFunction = void 0;
+exports.addCommands = exports.prettyPrint = exports.destroy = exports.deploy = exports.replayBlocks = exports.listFunctions = exports.isFunctionChanged = exports.isFunctionCodeChanged = exports.getFunctionCode = exports.getFunctionDictionary = exports.deleteFunction = void 0;
 const json_colorizer_1 = require("json-colorizer");
 const convert_1 = require("./convert");
 const fetcher_1 = require("./fetcher");
 const function_triggers_1 = require("./function-triggers");
 const sb_yaml_1 = require("./sb-yaml");
+const utils_1 = require("./utils");
 const zip_tools_1 = require("./zip-tools");
 function generateFunctionsApi() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -332,4 +333,63 @@ function prettyPrint(functions) {
     }));
 }
 exports.prettyPrint = prettyPrint;
+function addCommands(program) {
+    const functionsCommand = program.command("functions");
+    functionsCommand
+        .command("list")
+        .description("List all functions.")
+        .action(() => __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log("Listing functions...");
+            prettyPrint(yield listFunctions());
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+    functionsCommand
+        .command("delete")
+        .description("Delete a function.")
+        .argument("<name>", "Name of the function")
+        .action((name) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log("Deleting function...");
+            console.log(yield deleteFunction(name));
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+    functionsCommand
+        .command("replay-blocks")
+        .description("Replay blocks for a given set of functions.")
+        .option("--start <start block>", "Start block number (decimal or hex)")
+        .option("--end <end block>", "End block number (decimal or hex)")
+        .option("--functions <functions>", "Comma-separated list of function names")
+        .action((options) => __awaiter(this, void 0, void 0, function* () {
+        const missingArgs = ["start", "end"].filter((arg) => !options[arg]);
+        if (missingArgs.length > 0) {
+            console.error(`Missing required argument(s): ${missingArgs.join(", ")}`);
+            process.exit(1);
+        }
+        try {
+            let functionNames = [];
+            if (options.functions) {
+                functionNames = options.functions.split(",").map((f) => f.trim());
+            }
+            const functionsText = functionNames.length > 0
+                ? `functions ${JSON.stringify(functionNames)}`
+                : "all deployed functions in spec";
+            console.log(`Replaying blocks ${options.start} through ${options.end} for ${functionsText}...`);
+            yield replayBlocks(functionNames, options.start, options.end);
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+}
+exports.addCommands = addCommands;
 //# sourceMappingURL=functions.js.map

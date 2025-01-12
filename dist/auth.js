@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshToken = exports.login = exports.loadToken = void 0;
+exports.addCommands = exports.refreshToken = exports.login = exports.loadToken = void 0;
 const fs_1 = __importDefault(require("fs"));
 const prompts_1 = __importDefault(require("prompts"));
 const config_1 = require("./config");
+const utils_1 = require("./utils");
 function loadToken() {
     return __awaiter(this, void 0, void 0, function* () {
         // TODO - always refresh the token, and if it cannot be refreshed then prompt the user to login
@@ -35,28 +36,33 @@ function loadToken() {
 }
 exports.loadToken = loadToken;
 function login() {
-    return __awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, arguments, void 0, function* (options = {}) {
         (0, config_1.ensureSendBlocksConfigured)();
         if (!config_1.authUrl || config_1.authUrl.length === 0) {
             console.error("Project environment is invalid, run 'sb-cli env reset' to reset.");
             process.exit(1);
         }
-        const clientId = yield (0, prompts_1.default)({
-            type: "text",
-            name: "value",
-            message: "Enter your SendBlocks Client ID",
-        });
-        if (!clientId.value || clientId.value.length === 0) {
-            throw new Error("Client ID is required.");
+        let clientId = options.clientId;
+        if (!clientId) {
+            const clientIdInput = yield (0, prompts_1.default)({
+                type: "text",
+                name: "value",
+                message: "Enter your SendBlocks Client ID",
+            });
+            if (!clientIdInput.value || clientIdInput.value.length === 0) {
+                throw new Error("Client ID is required.");
+            }
+            clientId = clientIdInput.value;
         }
-        const secret = yield (0, prompts_1.default)({
+        const secretInput = yield (0, prompts_1.default)({
             type: "password",
             name: "value",
             message: "Enter your SendBlocks Secret",
         });
-        if (!secret.value || secret.value.length === 0) {
+        if (!secretInput.value || secretInput.value.length === 0) {
             throw new Error("Secret is required.");
         }
+        const secret = secretInput.value;
         // delete the .auth file
         try {
             fs_1.default.unlinkSync(".auth");
@@ -70,8 +76,8 @@ function login() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                clientId: clientId.value,
-                secret: secret.value,
+                clientId: clientId,
+                secret: secret,
             }),
         });
         if (!response.ok) {
@@ -125,4 +131,26 @@ function refreshToken() {
     });
 }
 exports.refreshToken = refreshToken;
+function addCommands(program) {
+    program
+        .command("login")
+        .description("Login with API credentials to retrieve a valid JWT token.")
+        .option("--client-id <client-id>", "Client ID (optional, will prompt if not provided)")
+        .option("--refresh", "Refresh the JWT token instead of logging in (cannot be used with --client-id)")
+        .action((options) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            if (options.refresh && !options.clientId) {
+                yield refreshToken();
+            }
+            else {
+                yield login(options);
+            }
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+}
+exports.addCommands = addCommands;
 //# sourceMappingURL=auth.js.map

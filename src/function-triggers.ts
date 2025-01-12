@@ -91,21 +91,21 @@ function isStorageAccessTriggerVariableChanged(
     return false;
 }
 
-function isStorageAccessTriggerTypeChanged(
-    sendblocksFunctionTrigger: components["schemas"]["StorageTriggerData"],
-    specFunctionTrigger: components["schemas"]["StorageTriggerData"],
-): boolean {
-    if (sendblocksFunctionTrigger.storage_address.toLowerCase() != specFunctionTrigger.storage_address.toLowerCase()) {
-        return true;
-    }
-    if (sendblocksFunctionTrigger.follow_proxy != specFunctionTrigger.follow_proxy) {
-        return true;
-    }
-    if (isStorageAccessTriggerVariableChanged(sendblocksFunctionTrigger.variable, specFunctionTrigger.variable)) {
-        return true;
-    }
-    return false;
-}
+// function isStorageAccessTriggerTypeChanged(
+//     sendblocksFunctionTrigger: components["schemas"]["StorageTriggerData"],
+//     specFunctionTrigger: components["schemas"]["StorageTriggerData"],
+// ): boolean {
+//     if (sendblocksFunctionTrigger.storage_address.toLowerCase() != specFunctionTrigger.storage_address.toLowerCase()) {
+//         return true;
+//     }
+//     if (sendblocksFunctionTrigger.follow_proxy != specFunctionTrigger.follow_proxy) {
+//         return true;
+//     }
+//     if (isStorageAccessTriggerVariableChanged(sendblocksFunctionTrigger.variable, specFunctionTrigger.variable)) {
+//         return true;
+//     }
+//     return false;
+// }
 
 export function areFunctionTriggersChanged(
     sendblocksFunctionTriggers: (
@@ -114,16 +114,16 @@ export function areFunctionTriggersChanged(
         | components["schemas"]["FunctionTriggerData"]
         | components["schemas"]["NewBlockTriggerData"]
         | components["schemas"]["NewContractTriggerData"]
-        | components["schemas"]["StorageTriggerData"]
     )[],
+    // | components["schemas"]["StorageTriggerData"]
     specFunctionTriggers: (
         | components["schemas"]["AddressTriggerData"]
         | components["schemas"]["EventTriggerData"]
         | components["schemas"]["FunctionTriggerData"]
         | components["schemas"]["NewBlockTriggerData"]
         | components["schemas"]["NewContractTriggerData"]
-        | components["schemas"]["StorageTriggerData"]
     )[],
+    // | components["schemas"]["StorageTriggerData"]
 ): boolean {
     if (sendblocksFunctionTriggers.length != specFunctionTriggers.length) {
         return true;
@@ -158,15 +158,15 @@ export function isFunctionTriggerChanged(
         | components["schemas"]["EventTriggerData"]
         | components["schemas"]["FunctionTriggerData"]
         | components["schemas"]["NewBlockTriggerData"]
-        | components["schemas"]["NewContractTriggerData"]
-        | components["schemas"]["StorageTriggerData"],
+        | components["schemas"]["NewContractTriggerData"],
+    // | components["schemas"]["StorageTriggerData"],
     specFunctionTrigger:
         | components["schemas"]["AddressTriggerData"]
         | components["schemas"]["EventTriggerData"]
         | components["schemas"]["FunctionTriggerData"]
         | components["schemas"]["NewBlockTriggerData"]
-        | components["schemas"]["NewContractTriggerData"]
-        | components["schemas"]["StorageTriggerData"],
+        | components["schemas"]["NewContractTriggerData"],
+    // | components["schemas"]["StorageTriggerData"],
 ): boolean {
     if (sendblocksFunctionTrigger.type != specFunctionTrigger.type) {
         return true;
@@ -197,11 +197,11 @@ export function isFunctionTriggerChanged(
                 throw new Error("Trigger type mismatch.");
             }
             return isContractTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
-        case "TRIGGER_TYPE_STORAGE_ACCESS":
-            if (specFunctionTrigger.type != "TRIGGER_TYPE_STORAGE_ACCESS") {
-                throw new Error("Trigger type mismatch.");
-            }
-            return isStorageAccessTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
+        // case "TRIGGER_TYPE_STORAGE_ACCESS":
+        //     if (specFunctionTrigger.type != "TRIGGER_TYPE_STORAGE_ACCESS") {
+        //         throw new Error("Trigger type mismatch.");
+        //     }
+        //     return isStorageAccessTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
         default:
             throw new Error(`Unsupported trigger type: ${specFunctionTrigger.type}`);
     }
@@ -249,18 +249,18 @@ function validateStorageAccessTriggerVariableType(variable: any): boolean {
     return true;
 }
 
-function validateStorageAccessTriggerType(trigger: components["schemas"]["StorageTriggerData"]) {
-    const errorPrefix = "Invalid Storage Access Trigger:";
-    if (!trigger.storage_address) {
-        throw new Error(`${errorPrefix} Storage address is required.`);
-    }
-    if (!trigger.variable) {
-        throw new Error(`${errorPrefix} Variable is required.`);
-    }
-    validateStorageAccessTriggerVariableType(trigger.variable);
+// function validateStorageAccessTriggerType(trigger: components["schemas"]["StorageTriggerData"]) {
+//     const errorPrefix = "Invalid Storage Access Trigger:";
+//     if (!trigger.storage_address) {
+//         throw new Error(`${errorPrefix} Storage address is required.`);
+//     }
+//     if (!trigger.variable) {
+//         throw new Error(`${errorPrefix} Variable is required.`);
+//     }
+//     validateStorageAccessTriggerVariableType(trigger.variable);
 
-    return true;
-}
+//     return true;
+// }
 
 export function validateFunctionTrigger(
     trigger:
@@ -268,8 +268,8 @@ export function validateFunctionTrigger(
         | components["schemas"]["EventTriggerData"]
         | components["schemas"]["FunctionTriggerData"]
         | components["schemas"]["NewBlockTriggerData"]
-        | components["schemas"]["NewContractTriggerData"]
-        | components["schemas"]["StorageTriggerData"],
+        | components["schemas"]["NewContractTriggerData"],
+    // | components["schemas"]["StorageTriggerData"],
 ) {
     if (!trigger) {
         throw new Error("Trigger is required.");
@@ -286,8 +286,8 @@ export function validateFunctionTrigger(
             break;
         case "TRIGGER_TYPE_NEW_CONTRACT":
             break;
-        case "TRIGGER_TYPE_STORAGE_ACCESS":
-            return validateStorageAccessTriggerType(trigger);
+        // case "TRIGGER_TYPE_STORAGE_ACCESS":
+        //     return validateStorageAccessTriggerType(trigger);
         default:
             throw new Error(`${triggerType} not recognized. A valid trigger type is required.`);
     }

@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = void 0;
+exports.addCommands = exports.destroy = void 0;
 const prompts_1 = __importDefault(require("prompts"));
 const functions = __importStar(require("./functions"));
 const sb_yaml_1 = require("./sb-yaml");
@@ -78,53 +78,94 @@ function destroy() {
             const functionResults = yield functions.destroy(stateChanges.functions);
             const webhookResults = yield webhooks.destroy(stateChanges.webhooks, functionResults);
             console.log("\nDeployment complete!");
-            console.log("Subgraph deployment results:");
-            console.table(subgraphResults, ["schema_name", "destroyed", "skipped", "response"]);
-            console.log("Function deployment results:");
-            console.table(functionResults, ["function_name", "destroyed", "skipped", "response"]);
-            console.log("\nWebhook deployment results:");
-            console.table(webhookResults, ["webhook_name", "destroyed", "skipped", "response"]);
+            if (subgraphResults.length > 0) {
+                console.log("Subgraph deployment results:");
+                console.table(subgraphResults, ["schema_name", "destroyed", "skipped", "response"]);
+            }
+            if (functionResults.length > 0) {
+                console.log("Function deployment results:");
+                console.table(functionResults, ["function_name", "destroyed", "skipped", "response"]);
+            }
+            if (webhookResults.length > 0) {
+                console.log("\nWebhook deployment results:");
+                console.table(webhookResults, ["webhook_name", "destroyed", "skipped", "response"]);
+            }
         }
     });
 }
 exports.destroy = destroy;
 function printStateChanges(stateChanges) {
     // print a table showing the differences between the states
-    console.log("Subgraphs:");
-    const combinedSubgraphChanges = [...stateChanges.subgraphs.changed, ...stateChanges.subgraphs.unchanged];
-    if (combinedSubgraphChanges.length > 0) {
-        console.log(" - To be destroyed:");
-        console.table(combinedSubgraphChanges, ["schema_name"]);
+    const hasSubgraphs = stateChanges.subgraphs.added.length > 0 ||
+        stateChanges.subgraphs.changed.length > 0 ||
+        stateChanges.subgraphs.unchanged.length > 0 ||
+        stateChanges.subgraphs.unreferenced.length > 0;
+    if (hasSubgraphs) {
+        console.log("Subgraphs:");
+        const combinedSubgraphChanges = [...stateChanges.subgraphs.changed, ...stateChanges.subgraphs.unchanged];
+        if (combinedSubgraphChanges.length > 0) {
+            console.log(" - To be destroyed:");
+            console.table(combinedSubgraphChanges, ["schema_name"]);
+        }
+        if (stateChanges.subgraphs.unreferenced.length > 0) {
+            console.log(" - Unreferenced:");
+            console.table(stateChanges.subgraphs.unreferenced, ["schema_name"]);
+        }
     }
-    if (stateChanges.subgraphs.unreferenced.length > 0) {
-        console.log(" - Unreferenced:");
-        console.table(stateChanges.subgraphs.unreferenced, ["schema_name"]);
+    const hasWebhooks = stateChanges.webhooks.added.length > 0 ||
+        stateChanges.webhooks.changed.length > 0 ||
+        stateChanges.webhooks.unchanged.length > 0 ||
+        stateChanges.webhooks.unreferenced.length > 0;
+    if (hasWebhooks) {
+        console.log("Webhooks:");
+        const combinedWebhookChanges = [...stateChanges.webhooks.changed, ...stateChanges.webhooks.unchanged];
+        if (combinedWebhookChanges.length > 0) {
+            console.log(" - To be destroyed:");
+            console.table(combinedWebhookChanges, ["webhook_name", "url", "webhook_id"]);
+        }
+        if (stateChanges.webhooks.unreferenced.length > 0) {
+            console.log(" - Unreferenced:");
+            console.table(stateChanges.webhooks.unreferenced, ["webhook_name", "url", "webhook_id"]);
+        }
     }
-    console.log("Webhooks:");
-    const combinedWebhookChanges = [...stateChanges.webhooks.changed, ...stateChanges.webhooks.unchanged];
-    if (combinedWebhookChanges.length > 0) {
-        console.log(" - To be destroyed:");
-        console.table(combinedWebhookChanges, ["webhook_name", "url", "webhook_id"]);
-    }
-    if (stateChanges.webhooks.unreferenced.length > 0) {
-        console.log(" - Unreferenced:");
-        console.table(stateChanges.webhooks.unreferenced, ["webhook_name", "url", "webhook_id"]);
-    }
-    console.log("Functions:");
-    const combinedFunctionChanges = [...stateChanges.functions.changed, ...stateChanges.functions.unchanged];
-    if (combinedFunctionChanges.length > 0) {
-        console.log(" - To be destroyed:");
-        console.table(combinedFunctionChanges, ["function_name", "function_id", "chain_id", "webhook"]);
-    }
-    if (stateChanges.functions.unreferenced.length > 0) {
-        console.log(" - Unreferenced:");
-        console.table(stateChanges.functions.unreferenced, [
-            "function_name",
-            "function_id",
-            "chain_id",
-            "trigger_types",
-            "webhook",
-        ]);
+    const hasFunctions = stateChanges.functions.added.length > 0 ||
+        stateChanges.functions.changed.length > 0 ||
+        stateChanges.functions.unchanged.length > 0 ||
+        stateChanges.functions.unreferenced.length > 0;
+    if (hasFunctions) {
+        console.log("Functions:");
+        const combinedFunctionChanges = [...stateChanges.functions.changed, ...stateChanges.functions.unchanged];
+        if (combinedFunctionChanges.length > 0) {
+            console.log(" - To be destroyed:");
+            console.table(combinedFunctionChanges, ["function_name", "function_id", "chain_id", "webhook"]);
+        }
+        if (stateChanges.functions.unreferenced.length > 0) {
+            console.log(" - Unreferenced:");
+            console.table(stateChanges.functions.unreferenced, [
+                "function_name",
+                "function_id",
+                "chain_id",
+                "trigger_types",
+                "webhook",
+            ]);
+        }
     }
 }
+function addCommands(program) {
+    program
+        .command("destroy")
+        .description("Delete the referenced resources on SendBlocks.")
+        .option("--dry-run", "Preview destructive changes only.")
+        .option("--non-interactive", "Delete without asking for confirmation.")
+        .action((options) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield destroy(options);
+        }
+        catch (error) {
+            console.error(error.message);
+            process.exit(1);
+        }
+    }));
+}
+exports.addCommands = addCommands;
 //# sourceMappingURL=destroy.js.map

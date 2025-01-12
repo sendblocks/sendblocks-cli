@@ -69,19 +69,24 @@ function isStorageAccessTriggerVariableChanged(sendblocksFunctionTriggerVariable
     }
     return false;
 }
-function isStorageAccessTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger) {
-    if (sendblocksFunctionTrigger.storage_address.toLowerCase() != specFunctionTrigger.storage_address.toLowerCase()) {
-        return true;
-    }
-    if (sendblocksFunctionTrigger.follow_proxy != specFunctionTrigger.follow_proxy) {
-        return true;
-    }
-    if (isStorageAccessTriggerVariableChanged(sendblocksFunctionTrigger.variable, specFunctionTrigger.variable)) {
-        return true;
-    }
-    return false;
-}
-function areFunctionTriggersChanged(sendblocksFunctionTriggers, specFunctionTriggers) {
+// function isStorageAccessTriggerTypeChanged(
+//     sendblocksFunctionTrigger: components["schemas"]["StorageTriggerData"],
+//     specFunctionTrigger: components["schemas"]["StorageTriggerData"],
+// ): boolean {
+//     if (sendblocksFunctionTrigger.storage_address.toLowerCase() != specFunctionTrigger.storage_address.toLowerCase()) {
+//         return true;
+//     }
+//     if (sendblocksFunctionTrigger.follow_proxy != specFunctionTrigger.follow_proxy) {
+//         return true;
+//     }
+//     if (isStorageAccessTriggerVariableChanged(sendblocksFunctionTrigger.variable, specFunctionTrigger.variable)) {
+//         return true;
+//     }
+//     return false;
+// }
+function areFunctionTriggersChanged(sendblocksFunctionTriggers, 
+// | components["schemas"]["StorageTriggerData"]
+specFunctionTriggers) {
     if (sendblocksFunctionTriggers.length != specFunctionTriggers.length) {
         return true;
     }
@@ -107,7 +112,9 @@ function areFunctionTriggersChanged(sendblocksFunctionTriggers, specFunctionTrig
     return true;
 }
 exports.areFunctionTriggersChanged = areFunctionTriggersChanged;
-function isFunctionTriggerChanged(sendblocksFunctionTrigger, specFunctionTrigger) {
+function isFunctionTriggerChanged(sendblocksFunctionTrigger, 
+// | components["schemas"]["StorageTriggerData"],
+specFunctionTrigger) {
     if (sendblocksFunctionTrigger.type != specFunctionTrigger.type) {
         return true;
     }
@@ -136,11 +143,11 @@ function isFunctionTriggerChanged(sendblocksFunctionTrigger, specFunctionTrigger
                 throw new Error("Trigger type mismatch.");
             }
             return isContractTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
-        case "TRIGGER_TYPE_STORAGE_ACCESS":
-            if (specFunctionTrigger.type != "TRIGGER_TYPE_STORAGE_ACCESS") {
-                throw new Error("Trigger type mismatch.");
-            }
-            return isStorageAccessTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
+        // case "TRIGGER_TYPE_STORAGE_ACCESS":
+        //     if (specFunctionTrigger.type != "TRIGGER_TYPE_STORAGE_ACCESS") {
+        //         throw new Error("Trigger type mismatch.");
+        //     }
+        //     return isStorageAccessTriggerTypeChanged(sendblocksFunctionTrigger, specFunctionTrigger);
         default:
             throw new Error(`Unsupported trigger type: ${specFunctionTrigger.type}`);
     }
@@ -183,17 +190,17 @@ function validateStorageAccessTriggerVariableType(variable) {
     }
     return true;
 }
-function validateStorageAccessTriggerType(trigger) {
-    const errorPrefix = "Invalid Storage Access Trigger:";
-    if (!trigger.storage_address) {
-        throw new Error(`${errorPrefix} Storage address is required.`);
-    }
-    if (!trigger.variable) {
-        throw new Error(`${errorPrefix} Variable is required.`);
-    }
-    validateStorageAccessTriggerVariableType(trigger.variable);
-    return true;
-}
+// function validateStorageAccessTriggerType(trigger: components["schemas"]["StorageTriggerData"]) {
+//     const errorPrefix = "Invalid Storage Access Trigger:";
+//     if (!trigger.storage_address) {
+//         throw new Error(`${errorPrefix} Storage address is required.`);
+//     }
+//     if (!trigger.variable) {
+//         throw new Error(`${errorPrefix} Variable is required.`);
+//     }
+//     validateStorageAccessTriggerVariableType(trigger.variable);
+//     return true;
+// }
 function validateFunctionTrigger(trigger) {
     if (!trigger) {
         throw new Error("Trigger is required.");
@@ -210,8 +217,8 @@ function validateFunctionTrigger(trigger) {
             break;
         case "TRIGGER_TYPE_NEW_CONTRACT":
             break;
-        case "TRIGGER_TYPE_STORAGE_ACCESS":
-            return validateStorageAccessTriggerType(trigger);
+        // case "TRIGGER_TYPE_STORAGE_ACCESS":
+        //     return validateStorageAccessTriggerType(trigger);
         default:
             throw new Error(`${triggerType} not recognized. A valid trigger type is required.`);
     }

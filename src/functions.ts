@@ -1,10 +1,12 @@
+import { Command } from "commander";
+import { color, colorize } from "json-colorizer";
 import { ApiResponse } from "openapi-typescript-fetch";
-import { colorize, color } from "json-colorizer";
 import { forceHexOrDecimalToDecimal } from "./convert";
 import { generateFetcher } from "./fetcher";
 import { areFunctionTriggersChanged } from "./function-triggers";
 import { listYamlFiles, mergeYamlFiles } from "./sb-yaml";
 import { components } from "./types/api";
+import { parseError } from "./utils";
 import { areBase64ZipFilesEquivalent, isPlainText } from "./zip-tools";
 
 async function generateFunctionsApi() {
@@ -308,4 +310,61 @@ export function prettyPrint(functions: any[]) {
             },
         }),
     );
+}
+
+export function addCommands(program: Command) {
+    const functionsCommand = program.command("functions");
+    functionsCommand
+        .command("list")
+        .description("List all functions.")
+        .action(async () => {
+            try {
+                console.log("Listing functions...");
+                prettyPrint(await listFunctions());
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
+    functionsCommand
+        .command("delete")
+        .description("Delete a function.")
+        .argument("<name>", "Name of the function")
+        .action(async (name) => {
+            try {
+                console.log("Deleting function...");
+                console.log(await deleteFunction(name));
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
+    functionsCommand
+        .command("replay-blocks")
+        .description("Replay blocks for a given set of functions.")
+        .option("--start <start block>", "Start block number (decimal or hex)")
+        .option("--end <end block>", "End block number (decimal or hex)")
+        .option("--functions <functions>", "Comma-separated list of function names")
+        .action(async (options: any) => {
+            const missingArgs = ["start", "end"].filter((arg) => !options[arg]);
+            if (missingArgs.length > 0) {
+                console.error(`Missing required argument(s): ${missingArgs.join(", ")}`);
+                process.exit(1);
+            }
+            try {
+                let functionNames: string[] = [];
+                if (options.functions) {
+                    functionNames = options.functions.split(",").map((f: string) => f.trim());
+                }
+                const functionsText =
+                    functionNames.length > 0
+                        ? `functions ${JSON.stringify(functionNames)}`
+                        : "all deployed functions in spec";
+                console.log(`Replaying blocks ${options.start} through ${options.end} for ${functionsText}...`);
+                await replayBlocks(functionNames, options.start, options.end);
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
 }

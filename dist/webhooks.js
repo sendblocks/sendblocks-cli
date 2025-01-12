@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.deploy = exports.deleteWebhook = exports.getWebhookDictionary = exports.listWebhooks = exports.isWebhookChanged = void 0;
+exports.addCommands = exports.destroy = exports.deploy = exports.deleteWebhook = exports.getWebhookDictionary = exports.listWebhooks = exports.isWebhookChanged = void 0;
 const fetcher_1 = require("./fetcher");
+const utils_1 = require("./utils");
 function generateWebhooksApi() {
     return __awaiter(this, void 0, void 0, function* () {
         const fetcher = yield (0, fetcher_1.generateFetcher)();
@@ -156,4 +157,35 @@ function destroy(stateChanges, functionDeploymentResults) {
     });
 }
 exports.destroy = destroy;
+function addCommands(program) {
+    const webhooksCommand = program.command("webhooks");
+    webhooksCommand
+        .command("list")
+        .description("List all webhooks.")
+        .action(() => __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log("Listing webhooks...");
+            console.log(yield listWebhooks());
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+    webhooksCommand
+        .command("delete")
+        .description("Delete a webhook.")
+        .argument("<name>", "Name of the webhook")
+        .action((name) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log("Deleting webhook...");
+            console.log(yield deleteWebhook(name));
+        }
+        catch (error) {
+            console.error((0, utils_1.parseError)(error));
+            process.exit(1);
+        }
+    }));
+}
+exports.addCommands = addCommands;
 //# sourceMappingURL=webhooks.js.map

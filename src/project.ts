@@ -1,7 +1,9 @@
+import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 import prompts from "prompts";
 import { ensureSendBlocksConfigured } from "./config";
+import { parseError } from "./utils";
 
 export const SAMPLES_CODE_FOLDER = "samples";
 export const TARGET_YAML_FILE = "samples.yaml";
@@ -122,4 +124,32 @@ export async function init(options: InitOptions = {}) {
     fs.copyFileSync(sourceEnvPath, targetEnvPath);
 
     console.log("\nProject initialized successfully!");
+}
+
+export function addCommands(program: Command) {
+    program
+        .command("env", { hidden: true })
+        .description("Get or reset the current environment variables.")
+        .argument("[env]", `Reset corrupted .env variables with "reset", or leave empty to show current configuration.`)
+        .action(async (env: string) => {
+            try {
+                await getSetEnvironment(env);
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
+
+    program
+        .command("init")
+        .description("Initialize a new project.")
+        .argument("[path]", "Path to the project folder.")
+        .action(async (path) => {
+            try {
+                await init({ path });
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
 }

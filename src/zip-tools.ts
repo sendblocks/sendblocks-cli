@@ -3,6 +3,8 @@ import fg from "fast-glob";
 import fs from "fs";
 import path from "path";
 
+const MAIN_FILE_NAMES = ["main.ts", "main.js"];
+
 export async function blobToBase64(blob: Blob): Promise<string> {
     const buffer = await blob.arrayBuffer();
     return Buffer.from(buffer).toString("base64");
@@ -24,7 +26,7 @@ export function isPlainText(base64: string): boolean {
     return printableChars.test(text);
 }
 
-export async function zipFolder(sourcePath: string): Promise<Blob> {
+export async function zipFolder(sourcePath: string, mainFile?: string): Promise<Blob> {
     const blobWriter = new BlobWriter("application/zip");
     const writer = new ZipWriter(blobWriter);
 
@@ -40,12 +42,39 @@ export async function zipFolder(sourcePath: string): Promise<Blob> {
     }
 
     const files = await fg("**/*", { cwd: sourcePath, dot: true, onlyFiles: true });
+    let addedMainFile: string | undefined = undefined;
     // Add each file to the archive
     for (const entry of files) {
-        const fullPath = path.join(sourcePath, entry);
-        const relativePath = path.relative(sourcePath, fullPath);
-        const fileBlob = new Blob([fs.readFileSync(fullPath)]);
-        await writer.add(relativePath, new BlobReader(fileBlob));
+        let baseName = path.basename(entry);
+        const localSourcePath = path.join(sourcePath, entry);
+
+        let localTargetPath = entry;
+        if (mainFile && mainFile === entry) {
+            // if the entry matches a specified mainFile, change the base filename to "main.ts"
+            baseName = "main.ts";
+            localTargetPath = path.join(path.dirname(entry), baseName);
+        }
+
+        if (MAIN_FILE_NAMES.includes(baseName)) {
+            if (addedMainFile) {
+                throw new Error(
+                    `Unable to add ${entry} to bundled source folder, main entrypoint file ${addedMainFile} already added`,
+                );
+            }
+            addedMainFile = entry;
+        }
+
+        const fileBlob = new Blob([fs.readFileSync(localSourcePath)]);
+        const zipEntryPath = path.relative(sourcePath, localTargetPath);
+        try {
+            await writer.add(zipEntryPath, new BlobReader(fileBlob));
+        } catch (error) {
+            throw new Error(`Error adding file ${localSourcePath} to zip file: ${error}`);
+        }
+    }
+
+    if (!addedMainFile) {
+        throw new Error("No main file found in the source folder, and no main file specified");
     }
 
     await writer.close();

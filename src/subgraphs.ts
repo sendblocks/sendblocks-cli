@@ -1,5 +1,8 @@
+import { Command } from "commander";
 import { ApiResponse } from "openapi-typescript-fetch";
 import { generateFetcher } from "./fetcher";
+import { generateCode } from "./graphql/codegen";
+import { parseError } from "./utils";
 
 async function generateSubgraphsApi() {
     const fetcher = await generateFetcher();
@@ -157,4 +160,46 @@ export async function destroy(stateChanges: ResourceStateChanges) {
     }
 
     return results;
+}
+
+export function addCommands(program: Command) {
+    const subgraphsCommand = program.command("subgraphs");
+    subgraphsCommand
+        .command("list")
+        .description("List all subgraph schemas.")
+        .action(async () => {
+            try {
+                console.log("Listing subgraph schemas...");
+                console.log(await listSubgraphSchemas({ warnOnAccessDenied: true }));
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
+    subgraphsCommand
+        .command("delete")
+        .description("Delete a subgraph schema.")
+        .argument("<name>", "Name of the subgraph schema")
+        .action(async (name) => {
+            try {
+                console.log("Deleting subgraph schema...");
+                console.log(await deleteSubgraphSchema(name));
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
+    subgraphsCommand
+        .command("gen")
+        .description("Generate typescript types from a graphql file")
+        .option("-s, --source <file>", "Path to the graphql file, defaults to schema.graphql", "schema.graphql")
+        .option("-o, --output <file>", "Path to the output file, defaults to <source file>.ts")
+        .action(async (options) => {
+            try {
+                console.log(await generateCode(options));
+            } catch (error: any) {
+                console.error(parseError(error));
+                process.exit(1);
+            }
+        });
 }

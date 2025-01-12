@@ -152,6 +152,20 @@ export interface paths {
     /** Delete Webhook */
     delete: operations["delete_webhook_api_v1_webhooks__id__delete"];
   };
+  "/api/v1/notifications/community": {
+    /** List Communities */
+    get: operations["list_communities_api_v1_notifications_community_get"];
+    /** Save Community */
+    post: operations["save_community_api_v1_notifications_community_post"];
+  };
+  "/api/v1/notifications/community/{community_notification_id}": {
+    /** Get Community */
+    get: operations["get_community_api_v1_notifications_community__community_notification_id__get"];
+    /** Delete Community */
+    delete: operations["delete_community_api_v1_notifications_community__community_notification_id__delete"];
+    /** Update Community */
+    patch: operations["update_community_api_v1_notifications_community__community_notification_id__patch"];
+  };
   "/api/v1/notifications/templates": {
     /** Get Templates */
     get: operations["get_templates_api_v1_notifications_templates_get"];
@@ -221,7 +235,32 @@ export interface components {
      * @description An enumeration of supported blockchain networks.
      * @enum {unknown}
      */
-    ChainNameEnum: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+    ChainNameEnum: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_MONAD_TESTNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+    /** CommunityNotification */
+    CommunityNotification: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Tenant Id */
+      tenant_id: string;
+      /** Function Id */
+      function_id: string;
+      /** Chain Id */
+      chain_id: string;
+      /** Contract Name */
+      contract_name: string;
+      /** Function Code */
+      function_code: string;
+      /** Triggers */
+      triggers: components["schemas"]["EventTriggerData"][];
+      details: components["schemas"]["CommunityNotificationWebhook"];
+    };
+    /** CommunityNotificationWebhook */
+    CommunityNotificationWebhook: {
+      /** Details */
+      details: components["schemas"]["DiscordWebhookDetails"] | components["schemas"]["TelegramWebhookDetails"];
+    };
     /** ContractRequest */
     ContractRequest: {
       /**
@@ -252,7 +291,21 @@ export interface components {
        * Trigger
        * @description A user trigger that will be set for every notification instance created from this template. Note that the trigger can contain parameter placeholder. ie $$address$$
        */
-      user_trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"];
+      user_trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"];
+    };
+    /** DiscordWebhookDetails */
+    DiscordWebhookDetails: {
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: "OUTPUT_CHANNEL_TYPE_DISCORD";
+      /**
+       * Webhook URL
+       * @description A URL to post output of a function
+       * @example https://example.com/webhook
+       */
+      url: string;
     };
     /** Event */
     Event: {
@@ -262,7 +315,7 @@ export interface components {
        * @example EVENT_TYPE_RUN_FUNCTION
        * @enum {string}
        */
-      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE" | "EVENT_TYPE_FUNCTION_RATE_LIMIT_EXCEEDED" | "EVENT_TYPE_DATA_SEND_QUOTA_EXCEEDED";
+      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE" | "EVENT_TYPE_FUNCTION_RATE_LIMIT_EXCEEDED" | "EVENT_TYPE_DATA_SEND_QUOTA_EXCEEDED" | "EVENT_TYPE_NOTIFICATION";
       /** Timestamp */
       timestamp?: string;
       /** Payload */
@@ -313,7 +366,7 @@ export interface components {
       /** Function Id */
       function_id: string;
       /** Triggers */
-      triggers: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"])[];
+      triggers: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"])[];
       /** Webhook Id */
       webhook_id: string;
       /** Function Name */
@@ -365,7 +418,7 @@ export interface components {
        * Triggers
        * @description Change the triggers that will invoke the function.
        */
-      triggers?: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"])[];
+      triggers?: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"])[];
       /**
        * Description
        * @description A description of the function
@@ -407,12 +460,12 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_MONAD_TESTNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * Trigger
        * @description Trigger that will invoke the function
        */
-      trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"];
+      trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"];
       /**
        * Block number
        * @description Block number to samples trigger from
@@ -482,6 +535,19 @@ export interface components {
       custom_parameters?: {
         [key: string]: string;
       };
+    };
+    /** Page[CommunityNotification] */
+    Page_CommunityNotification_: {
+      /** Items */
+      items: components["schemas"]["CommunityNotification"][];
+      /** Total */
+      total?: number;
+      /** Page */
+      page?: number;
+      /** Size */
+      size?: number;
+      /** Pages */
+      pages?: number;
     };
     /** Page[Event] */
     Page_Event_: {
@@ -600,6 +666,18 @@ export interface components {
       /** Pages */
       pages?: number;
     };
+    /** PatchCommunityNotificationRequest */
+    PatchCommunityNotificationRequest: {
+      /** Name */
+      name?: string;
+      /** Contract Name */
+      contract_name?: string;
+      /** Function Code */
+      function_code?: string;
+      /** Triggers */
+      triggers?: components["schemas"]["EventTriggerData"][];
+      details?: components["schemas"]["CommunityNotificationWebhook"];
+    };
     /** PlaygroundFunctionData */
     PlaygroundFunctionData: {
       /** Code */
@@ -644,7 +722,7 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_MONAD_TESTNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * StartBlockNumber
        * @description The first block number that will be replayed
@@ -676,6 +754,31 @@ export interface components {
       /** Usage End Date */
       usage_end_date: string;
     };
+    /** SaveCommunityNotificationRequest */
+    SaveCommunityNotificationRequest: {
+      /** Name */
+      name: string;
+      /** Contract Name */
+      contract_name: string;
+      /** Function Code */
+      function_code: string;
+      /**
+       * Chain
+       * @description Chain for the function to run on
+       * @default CHAIN_ETH_MAINNET
+       * @example CHAIN_ETH_MAINNET
+       * @enum {string}
+       */
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_MONAD_TESTNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      /** Triggers */
+      triggers: components["schemas"]["EventTriggerData"][];
+      details: components["schemas"]["CommunityNotificationWebhook"];
+    };
+    /** SaveCommunityNotificationResponse */
+    SaveCommunityNotificationResponse: {
+      /** Community Notification Id */
+      community_notification_id?: string;
+    };
     /** SaveFunctionRequest */
     SaveFunctionRequest: {
       /**
@@ -685,12 +788,12 @@ export interface components {
        * @example CHAIN_ETH_MAINNET
        * @enum {string}
        */
-      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
+      chain_id?: "CHAIN_ARBITRUM_ONE" | "CHAIN_BASE_MAINNET" | "CHAIN_BNB_MAINNET" | "CHAIN_BNB_TESTNET" | "CHAIN_CELO_MAINNET" | "CHAIN_COSMOS_OSMOSIS" | "CHAIN_ETH_MAINNET" | "CHAIN_ETH_SEPOLIA" | "CHAIN_FANTOM_MAINNET" | "CHAIN_LINEA_MAINNET" | "CHAIN_MANTLE_MAINNET" | "CHAIN_MONAD_TESTNET" | "CHAIN_POLYGON_MAINNET" | "CHAIN_SOLANA_MAINNET" | "CHAIN_STARKNET_MAINNET";
       /**
        * Triggers
        * @description Triggers that will invoke the function
        */
-      triggers: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"])[];
+      triggers: (components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"])[];
       /**
        * Webhook ID
        * @description Webhook ID as returned from SaveWebhook
@@ -845,7 +948,7 @@ export interface components {
        * @example EVENT_TYPE_RUN_FUNCTION
        * @enum {string}
        */
-      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE" | "EVENT_TYPE_FUNCTION_RATE_LIMIT_EXCEEDED" | "EVENT_TYPE_DATA_SEND_QUOTA_EXCEEDED";
+      event_type: "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_RUN_FUNCTION" | "EVENT_TYPE_WEBHOOK_RESPONSE" | "EVENT_TYPE_FUNCTION_RATE_LIMIT_EXCEEDED" | "EVENT_TYPE_DATA_SEND_QUOTA_EXCEEDED" | "EVENT_TYPE_NOTIFICATION";
       /** Func Id */
       func_id?: string;
       /** Webhook Id */
@@ -860,57 +963,6 @@ export interface components {
       /** Value */
       value?: unknown;
     };
-    /** By Slot */
-    StorageSlotTrigger: {
-      /**
-       * Slot
-       * @description Hex encoded slot value
-       * @example 0x4567
-       */
-      variable_slot: string;
-    };
-    /** Storage Trigger */
-    StorageTriggerData: {
-      /**
-       * Type
-       * @enum {string}
-       */
-      type: "TRIGGER_TYPE_STORAGE_ACCESS";
-      /**
-       * Storage Address
-       * @description Address to watch for storage changes
-       * @example 0x4db1f25d3d98600140dfc18deb7515be5bd293af
-       */
-      storage_address: string;
-      /**
-       * Follow Proxy
-       * @description Search for a variable name in an implementation contract
-       * @default true
-       */
-      follow_proxy?: boolean;
-      /** Variable */
-      variable: components["schemas"]["StorageVariableTrigger"] | components["schemas"]["StorageSlotTrigger"];
-      /**
-       * Custom parameters
-       * @description Parameters to be passed to the function when it is triggered by this trigger
-       * @example {
-       *   "key": "value",
-       *   "key2": "value2"
-       * }
-       */
-      custom_parameters?: {
-        [key: string]: string;
-      };
-    };
-    /** By Variable Name */
-    StorageVariableTrigger: {
-      /**
-       * Variable Name
-       * @description Name of variable to watch for changes
-       * @example totalSupply
-       */
-      variable_name: string;
-    };
     /** SubgraphQueryRequest */
     SubgraphQueryRequest: {
       /**
@@ -918,6 +970,38 @@ export interface components {
        * @description The query to be executed on the subgraph
        */
       query: string;
+    };
+    /** TelegramWebhookDetails */
+    TelegramWebhookDetails: {
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: "OUTPUT_CHANNEL_TYPE_TELEGRAM";
+      /**
+       * The bot name
+       * @description The name of the bot
+       * @example my_bot
+       */
+      bot_name: string;
+      /**
+       * The bot token
+       * @description The token of the bot
+       * @example 1234567890:ABCDEF
+       */
+      bot_token: string;
+      /**
+       * The chat id
+       * @description The chat id
+       * @example -10012789124
+       */
+      chat_id: string;
+      /**
+       * The thread id
+       * @description The thread id
+       * @example 1234567890
+       */
+      thread_id?: string;
     };
     /** TemplateInfo */
     TemplateInfo: {
@@ -928,7 +1012,7 @@ export interface components {
       /** Function Id */
       function_id: string;
       /** User Trigger */
-      user_trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"] | components["schemas"]["StorageTriggerData"];
+      user_trigger: components["schemas"]["AddressTriggerData"] | components["schemas"]["EventTriggerData"] | components["schemas"]["FunctionTriggerData"] | components["schemas"]["NewBlockTriggerData"] | components["schemas"]["NewContractTriggerData"];
       /** Parameter Names */
       parameter_names: string[];
     };
@@ -1164,6 +1248,9 @@ export interface operations {
   list_functions_api_v1_functions_get: {
     parameters: {
       query?: {
+        function_name?: string;
+        is_enabled?: boolean;
+        chain_id?: string;
         page?: number;
         size?: number;
       };
@@ -2218,6 +2305,128 @@ export interface operations {
       /** @description Internal Server Error */
       500: {
         content: never;
+      };
+    };
+  };
+  /** List Communities */
+  list_communities_api_v1_notifications_community_get: {
+    parameters: {
+      query?: {
+        name?: string;
+        contract_name?: string;
+        is_enabled?: boolean;
+        chain_id?: string;
+        page?: number;
+        size?: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_CommunityNotification_"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Save Community */
+  save_community_api_v1_notifications_community_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveCommunityNotificationRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        content: {
+          "application/json": components["schemas"]["SaveCommunityNotificationResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Get Community */
+  get_community_api_v1_notifications_community__community_notification_id__get: {
+    parameters: {
+      path: {
+        community_notification_id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["CommunityNotification"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete Community */
+  delete_community_api_v1_notifications_community__community_notification_id__delete: {
+    parameters: {
+      path: {
+        community_notification_id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["CommunityNotification"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Community */
+  update_community_api_v1_notifications_community__community_notification_id__patch: {
+    parameters: {
+      path: {
+        community_notification_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PatchCommunityNotificationRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
       };
     };
   };
